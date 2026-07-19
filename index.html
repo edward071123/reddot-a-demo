@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>軍事博物館智慧物聯網平台</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="loginScreen" class="login-screen">
+      <section class="login-visual" aria-label="博物館建築示意"></section>
+      <section class="login-panel">
+        <img class="login-emblem" src="assets/emblem.png" alt="平台徽章" />
+        <h1>Smart Building System</h1>
+        <form id="loginForm" class="login-form">
+          <label>
+            <span>帳號</span>
+            <input id="username" name="username" autocomplete="username" value="admin" />
+          </label>
+          <label>
+            <span>密碼</span>
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Password" />
+          </label>
+          <p id="loginError" class="login-error" role="alert"></p>
+          <button type="submit">Login</button>
+        </form>
+        <p class="site-title">軍事博物館<br />智慧物聯網平台</p>
+      </section>
+    </main>
+
+    <main id="appShell" class="app-shell is-hidden">
+      <aside class="sidebar">
+        <div class="sidebar-heading">
+          <button class="menu-mark" type="button" data-home aria-label="回到首頁">
+            <span></span><span></span><span></span>
+          </button>
+          <button class="sidebar-section" type="button" data-home>事務管理</button>
+        </div>
+        <nav class="main-nav" aria-label="主選單">
+          <button class="nav-item" type="button" data-view="security">
+            <span class="nav-icon building-icon"></span>
+            <span><strong>Building Information</strong><small>監控儀表板</small></span>
+          </button>
+          <button class="nav-item" type="button" data-view="loginAdmin">
+            <span class="nav-icon login-icon"></span>
+            <span><strong>Login</strong><small>權限密碼管理</small></span>
+          </button>
+          <button class="nav-item" type="button" data-view="sensor">
+            <span class="nav-icon sensor-icon"></span>
+            <span><strong>Sensor</strong><small>感測器管理</small></span>
+          </button>
+          <button class="nav-item" type="button" data-view="alarm">
+            <span class="nav-icon alarm-icon"></span>
+            <span><strong>Alarm</strong><small>警報歷程管理</small></span>
+          </button>
+          <button class="nav-item" type="button" data-view="dashboard">
+            <span class="nav-icon iot-icon"></span>
+            <span><strong>IOT</strong><small>物聯網數據平台</small></span>
+          </button>
+        </nav>
+        <img class="sidebar-emblem" src="assets/emblem.png" alt="" />
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <button class="topbar-menu" type="button" data-home aria-label="回到首頁">
+            <span></span><span></span><span></span>
+          </button>
+          <nav id="breadcrumbs" class="breadcrumbs" aria-label="目前位置">
+            <button type="button" data-home>首頁</button><span> / IOT 物聯網數據平台</span>
+          </nav>
+          <strong>Reddot Smart Building System</strong>
+        </header>
+
+        <section id="dashboardView" class="view is-current dashboard-page" aria-label="物聯網數據平台">
+          <div class="kpi-strip">
+            <article class="kpi-card teal"><p>本週　累積入場人數<br>空間：特展區</p><strong>2304</strong></article>
+            <article class="kpi-card cyan"><p>本日　累計入館人數<br>空間：展演廳</p><strong>1090</strong></article>
+            <article class="kpi-card amber"><p>本月　累計入場人數<br>空間：軍事館</p><strong>381</strong></article>
+            <article class="kpi-card hot"><p>展館總人次 即時狀態</p><strong>889</strong></article>
+          </div>
+
+          <div class="main-dashboard">
+            <article class="dash-card people-analysis">
+              <h2>分館人次分析</h2>
+              <div class="people-bars">
+                <div><i style="height:86%"></i><b style="height:58%"></b><span>1F 特展區</span></div>
+                <div><i style="height:22%"></i><b style="height:30%"></b><span>1F 展演廳</span></div>
+                <div><i style="height:34%"></i><b style="height:29%"></b><span>2F 展廳一</span></div>
+                <div><i style="height:54%"></i><b style="height:43%"></b><span>展覽廳二</span></div>
+                <div><i style="height:62%"></i><b style="height:36%"></b><span>視聽室</span></div>
+                <div><i style="height:42%"></i><b style="height:31%"></b><span>動態展演廳</span></div>
+                <div><i style="height:34%"></i><b style="height:29%"></b><span>表演廳</span></div>
+              </div>
+            </article>
+            <article class="dash-card alert-summary">
+              <h2>館內警報偵測</h2>
+              <p><strong>03/04　08:30</strong>二樓特展區異常門位觸發</p>
+              <p><strong>03/04　03:42</strong>一樓櫃檯 煙霧偵測異常</p>
+              <p><strong>02/27　14:23</strong>第三展館 電子圍籬跨越警報</p>
+            </article>
+          </div>
+
+          <div class="bottom-dashboard">
+            <article class="dash-card heat-card">
+              <h2>全館人流熱區</h2>
+              <div class="ring-chart">
+                <span class="slice-label label-general">一般<br>32.2%</span>
+                <span class="slice-label label-theme">主題<br>28.2%</span>
+                <span class="slice-label label-edu">教育<br>25%</span>
+                <span class="slice-label label-second">二展<br>14.6%</span>
+              </div>
+              <p class="heat-legend"><i></i>一般展區 32.2% <i></i>主題特展 28.2% <i></i>教育館 25% <i></i>第二展區 14.6%</p>
+            </article>
+            <article class="dash-card env-card">
+              <h2>即時溫濕度偵測</h2>
+              <div class="env-readings">
+                <section><span>Temp.</span><strong id="tempValue">27<small>.5</small>°C</strong></section>
+                <section><span>Humidity %RH</span><strong id="humidityValue">60<small>.1</small>%RH</strong></section>
+                <ol>
+                  <li><button type="button" data-room="1">典藏庫房 No. 1</button></li>
+                  <li><button type="button" data-room="2">典藏庫房 No. 2</button></li>
+                  <li><button type="button" data-room="3">典藏庫房 No. 3</button></li>
+                  <li><button class="hot-text is-selected" type="button" data-room="4">典藏庫房 No. 4</button></li>
+                  <li><button type="button" data-room="5">典藏庫房 No. 5</button></li>
+                  <li><button type="button" data-room="6">典藏庫房 No. 6</button></li>
+                  <li><button type="button" data-room="7">典藏庫房 No. 7</button></li>
+                  <li><button type="button" data-room="8">典藏庫房 No. 8</button></li>
+                </ol>
+              </div>
+            </article>
+            <article class="dash-card type-card">
+              <h2>全館警報型態分析</h2>
+              <div class="type-bars"><label>煙霧偵測<i style="width:58%"></i><b style="width:32%"></b></label><label>磁簧<i style="width:22%"></i><b style="width:28%"></b></label><label>電子圍籬<i style="width:96%"></i><b style="width:96%"></b></label></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="alarmView" class="view alarm-page" aria-label="警報歷程管理">
+          <div class="alarm-heading"><span class="title-icon alarm-icon"></span><h2>警報管理</h2></div>
+          <div class="alarm-tools">
+            <label>搜尋：警報
+              <select id="alarmType">
+                <option value="">全部</option>
+                <option value="玻璃感應器">玻璃感應器</option>
+                <option value="磁簧開啟">磁簧開啟</option>
+                <option value="震動感應">震動感應</option>
+                <option value="遺失物發生">遺失物發生</option>
+                <option value="淹水感測">淹水感測</option>
+                <option value="煙霧偵測器">煙霧偵測器</option>
+                <option value="跨區警戒">跨區警戒</option>
+              </select>
+            </label>
+            <label>樓層
+              <select id="floorFilter">
+                <option>4F</option>
+                <option>3F</option>
+                <option>2F</option>
+                <option>1F</option>
+              </select>
+            </label>
+            <label>日期
+              <select id="dateFilter">
+                <option>2026.01.29</option>
+                <option>2026.01.15</option>
+                <option>2026.01.03</option>
+                <option>2026.01.02</option>
+                <option>2025.12.28</option>
+              </select>
+            </label>
+            <label>時間
+              <select id="timeFilter">
+                <option>13:00</option>
+                <option>08:30</option>
+                <option>22:00</option>
+                <option>11:23</option>
+                <option>08:23</option>
+              </select>
+            </label>
+          </div>
+          <table class="alarm-table">
+            <thead><tr><th>警報點</th><th>位置</th><th>告警訊息</th><th>發生時間</th><th>處理狀態</th><th>發送紀錄</th></tr></thead>
+            <tbody id="alarmRows"></tbody>
+          </table>
+          <button id="exportBtn" class="alarm-export" type="button">匯出搜尋資料清單</button>
+        </section>
+
+        <section id="securityView" class="view security-page" aria-label="安防圖控">
+          <h2>4F 展館3-2</h2>
+          <div class="security-layout">
+            <svg viewBox="0 0 1400 520" role="img" aria-label="4F 展館平面圖">
+              <rect x="70" y="45" width="1260" height="410" />
+              <path d="M100 105H1300v40h-145v260H185V145h-85z" />
+              <path d="M270 250h190v75H270zM585 175h250v90H585zM925 165h280v120H925zM520 350h360v55H520z" />
+              <path d="M230 75v95M420 75v95M610 75v95M800 75v95M990 75v95M1180 75v95" />
+              <g class="artifact"><rect x="315" y="210" width="145" height="48" rx="22"/><line x1="340" y1="234" x2="435" y2="234"/></g>
+              <g class="artifact"><rect x="645" y="210" width="175" height="48" rx="22"/><line x1="670" y1="234" x2="790" y2="234"/></g>
+              <g class="artifact"><rect x="970" y="210" width="190" height="48" rx="22"/><line x1="1000" y1="234" x2="1130" y2="234"/></g>
+              <g class="dots"><circle cx="210" cy="170" r="9"/><circle cx="515" cy="170" r="9"/><circle cx="855" cy="160" r="9"/><circle cx="1240" cy="180" r="9"/><circle cx="390" cy="380" r="9"/><circle cx="1120" cy="380" r="9"/></g>
+              <g class="warn" transform="translate(395 88)"><path d="M45 0 90 78H0Z"/><text x="45" y="58">!</text></g>
+              <g class="warn" transform="translate(830 358)"><path d="M45 0 90 78H0Z"/><text x="45" y="58">!</text></g>
+            </svg>
+          </div>
+          <div class="security-status">
+            <span>淹水警報 ≋</span><span>煙霧偵測 ▲</span><span>磁簧開啟 ● D-12　21:32</span><span>玻璃破碎 ▧</span>
+            <strong>警戒　07:34 展示櫃開啟　02:10 電子圍籬跨越</strong>
+          </div>
+        </section>
+
+        <section id="loginAdminView" class="view account-page" aria-label="權限密碼管理">
+          <div class="account-heading">
+            <div>
+              <h2>權限密碼管理</h2>
+              <p>所有管理人員帳號、密碼與系統權限總覽</p>
+            </div>
+            <button type="button">新增管理人員</button>
+          </div>
+          <div class="account-tools">
+            <label>搜尋 <input value="全部管理人員" /></label>
+            <label>角色 <select><option>全部角色</option><option>系統管理員</option><option>策展管理</option><option>維運人員</option><option>安防人員</option></select></label>
+            <label>狀態 <select><option>全部狀態</option><option>啟用</option><option>停用</option></select></label>
+            <span>共 6 位管理人員</span>
+          </div>
+          <div class="account-table-card">
+            <table class="account-table">
+              <thead>
+                <tr>
+                  <th>管理人員</th>
+                  <th>帳號</th>
+                  <th>密碼</th>
+                  <th>角色</th>
+                  <th>權限範圍</th>
+                  <th>狀態</th>
+                  <th>最後登入</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>王志明</td><td>admin</td><td>123123</td><td>系統管理員</td><td>全館 / 帳密 / 警報 / 感測器</td><td><span class="status-on">啟用</span></td><td>2026.07.20 08:30</td><td><button>編輯</button><button>重設</button></td></tr>
+                <tr><td>林佳蓉</td><td>curator</td><td>curator2026</td><td>策展管理</td><td>展廳資訊 / 人流分析</td><td><span class="status-on">啟用</span></td><td>2026.07.19 17:12</td><td><button>編輯</button><button>重設</button></td></tr>
+                <tr><td>陳建宏</td><td>operator</td><td>op2026</td><td>維運人員</td><td>設備點位 / 溫濕度 / 感測器</td><td><span class="status-on">啟用</span></td><td>2026.07.19 09:45</td><td><button>編輯</button><button>重設</button></td></tr>
+                <tr><td>張雅婷</td><td>security</td><td>sec2026</td><td>安防人員</td><td>安防圖控 / 警戒事件</td><td><span class="status-on">啟用</span></td><td>2026.07.18 22:05</td><td><button>編輯</button><button>重設</button></td></tr>
+                <tr><td>許文凱</td><td>alarm</td><td>alarm2026</td><td>警報處理</td><td>警報歷程 / 發送紀錄</td><td><span class="status-on">啟用</span></td><td>2026.07.18 13:28</td><td><button>編輯</button><button>重設</button></td></tr>
+                <tr><td>黃郁庭</td><td>viewer</td><td>view2026</td><td>資料檢視</td><td>儀表板唯讀</td><td><span class="status-off">停用</span></td><td>2026.07.10 11:02</td><td><button>編輯</button><button>啟用</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section id="sensorView" class="view sensor-page" aria-label="感測器管理">
+          <div class="sensor-heading">
+            <div>
+              <h2>感測器管理</h2>
+              <p>煙霧、磁簧、玻璃破碎、淹水與人流感測器連線狀態</p>
+            </div>
+            <button type="button">新增感測器</button>
+          </div>
+          <div class="sensor-tools">
+            <label>類型 <select><option>全部類型</option><option>煙霧偵測</option><option>磁簧</option><option>玻璃破碎</option><option>淹水感測</option><option>人流感測</option></select></label>
+            <label>樓層 <select><option>全部樓層</option><option>4F</option><option>3F</option><option>2F</option><option>1F</option></select></label>
+            <label>狀態 <select><option>全部狀態</option><option>正常</option><option>警戒</option><option>離線</option></select></label>
+            <span>共 8 組感測器</span>
+          </div>
+          <div class="sensor-table-card">
+            <table class="sensor-table">
+              <thead>
+                <tr><th>感測器編號</th><th>類型</th><th>位置</th><th>目前數值</th><th>電量</th><th>狀態</th><th>更新時間</th><th>操作</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>S-4F-001</td><td>玻璃破碎</td><td>4F 第三展廳</td><td>震動 78%</td><td>92%</td><td><span class="status-warn">警戒</span></td><td>2026.07.20 09:12</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>M-4F-012</td><td>磁簧</td><td>4F 第一展廳</td><td>D-12 開啟</td><td>86%</td><td><span class="status-warn">警戒</span></td><td>2026.07.20 09:10</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>T-2F-004</td><td>溫濕度</td><td>典藏庫房 No. 4</td><td>27.5°C / 60.1%RH</td><td>100%</td><td><span class="status-on">正常</span></td><td>2026.07.20 09:00</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>F-1F-002</td><td>煙霧偵測</td><td>1F 櫃檯</td><td>PM 12</td><td>78%</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:58</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>W-2F-003</td><td>淹水感測</td><td>2F 第二展廳</td><td>乾燥</td><td>81%</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:55</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>P-1F-018</td><td>人流感測</td><td>1F 特展區</td><td>496 人次</td><td>外接</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:50</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>P-2F-021</td><td>人流感測</td><td>2F 展覽廳二</td><td>328 人次</td><td>外接</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:48</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>F-3F-006</td><td>煙霧偵測</td><td>3F 文物櫃</td><td>離線</td><td>12%</td><td><span class="status-off">離線</span></td><td>2026.07.19 22:14</td><td><button>查看</button><button>更換</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
