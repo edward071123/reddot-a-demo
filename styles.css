@@ -1217,16 +1217,6 @@ td:nth-child(3) { text-align: left; }
   font-weight: 900;
 }
 
-.house-tag {
-  display: inline-block;
-  min-width: 42px;
-  padding: 5px 9px;
-  border-radius: 5px;
-  color: #f15863;
-  background: #ffe9ec;
-  font-weight: 900;
-}
-
 .access-actions {
   display: flex;
   justify-content: space-between;

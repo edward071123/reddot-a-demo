@@ -138,7 +138,6 @@ function renderSelectedAccess(row) {
       <td>${row.dataset.card}</td>
       <td>${row.dataset.name}</td>
       <td>${row.dataset.phone}</td>
-      <td>${row.dataset.house}</td>
     </tr>
   `;
 }
