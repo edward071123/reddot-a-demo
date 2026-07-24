@@ -46,6 +46,10 @@ const viewMeta = {
     id: "loginAdminView",
     crumb: "Login 權限密碼管理",
   },
+  access: {
+    id: "accessView",
+    crumb: "門禁管理 / 門禁授權",
+  },
   sensor: {
     id: "sensorView",
     crumb: "Sensor 感測器管理",
@@ -61,6 +65,7 @@ const alarmType = document.querySelector("#alarmType");
 const breadcrumbs = document.querySelector("#breadcrumbs");
 const tempValue = document.querySelector("#tempValue");
 const humidityValue = document.querySelector("#humidityValue");
+const selectedAccessRows = document.querySelector("#selectedAccessRows");
 
 function setLoggedIn() {
   loginScreen.classList.add("is-hidden");
@@ -120,6 +125,23 @@ function setRoomReading(roomId) {
   });
 }
 
+function renderSelectedAccess(row) {
+  if (!selectedAccessRows || !row) return;
+
+  document.querySelectorAll("[data-access-row]").forEach((item) => {
+    item.classList.toggle("is-picked", item === row);
+  });
+
+  selectedAccessRows.innerHTML = `
+    <tr>
+      <td>${row.dataset.card}</td>
+      <td>${row.dataset.name}</td>
+      <td>${row.dataset.phone}</td>
+      <td>${row.dataset.house}</td>
+    </tr>
+  `;
+}
+
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(loginForm);
@@ -147,6 +169,11 @@ document.addEventListener("click", (event) => {
   const roomButton = event.target.closest("[data-room]");
   if (roomButton) {
     setRoomReading(roomButton.dataset.room);
+  }
+
+  const accessRow = event.target.closest("[data-access-row]");
+  if (accessRow) {
+    renderSelectedAccess(accessRow);
   }
 });
 

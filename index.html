@@ -45,6 +45,10 @@
             <span class="nav-icon login-icon"></span>
             <span><strong>Login</strong><small>權限密碼管理</small></span>
           </button>
+          <button class="nav-item" type="button" data-view="access">
+            <span class="nav-icon access-icon"></span>
+            <span><strong>Access</strong><small>門禁管理</small></span>
+          </button>
           <button class="nav-item" type="button" data-view="sensor">
             <span class="nav-icon sensor-icon"></span>
             <span><strong>Sensor</strong><small>感測器管理</small></span>
@@ -246,6 +250,65 @@
             </table>
           </div>
         </section>
+
+        <section id="accessView" class="view access-page" aria-label="門禁管理">
+          <div class="access-tabs" aria-label="門禁管理分頁">
+            <button type="button" data-home>首頁</button>
+            <button class="is-active" type="button">門禁授權 <span>×</span></button>
+            <button type="button">會員管理 <span>×</span></button>
+          </div>
+
+          <div class="access-steps" aria-label="授權流程">
+            <div class="step is-active"><b>1</b><strong>Step 1</strong></div>
+            <div class="step"><b>2</b><strong>Step 2</strong></div>
+            <div class="step"><b>3</b><strong>Step 3</strong></div>
+          </div>
+
+          <div class="access-board">
+            <section class="access-panel access-source" aria-label="住戶清單">
+              <div class="access-search">
+                <label><span>⌕</span><input id="accessNameSearch" placeholder="請輸入搜尋客戶名稱" /></label>
+                <label><span>⌕</span><input id="accessPhoneSearch" placeholder="請輸入搜尋客戶手機" /></label>
+                <button id="accessSearchBtn" type="button">搜尋</button>
+              </div>
+              <table class="access-table">
+                <thead>
+                  <tr><th>卡號</th><th>客戶姓名</th><th>客戶手機</th><th>戶號別</th></tr>
+                </thead>
+                <tbody id="accessRows">
+                  <tr class="is-picked" data-access-row data-card="3265708516" data-name="王志明" data-phone="0912-305-816" data-house="劍榕"><td>3265708516</td><td>王志明</td><td>0912-305-816</td><td><span class="house-tag">劍榕</span></td></tr>
+                  <tr data-access-row data-card="0831011879" data-name="林佳蓉" data-phone="0931-011-879" data-house="劍榕"><td>0831011879</td><td>林佳蓉</td><td>0931-011-879</td><td><span class="house-tag">劍榕</span></td></tr>
+                  <tr data-access-row data-card="0839848711" data-name="陳建宏" data-phone="0939-848-711" data-house="劍榕"><td>0839848711</td><td>陳建宏</td><td>0939-848-711</td><td><span class="house-tag">劍榕</span></td></tr>
+                  <tr data-access-row data-card="0840222999" data-name="張雅婷" data-phone="0940-222-999" data-house="劍榕"><td>0840222999</td><td>張雅婷</td><td>0940-222-999</td><td><span class="house-tag">劍榕</span></td></tr>
+                  <tr data-access-row data-card="0830930759" data-name="許文凱" data-phone="0930-930-759" data-house="劍榕"><td>0830930759</td><td>許文凱</td><td>0930-930-759</td><td><span class="house-tag">劍榕</span></td></tr>
+                  <tr data-access-row data-card="0898105335" data-name="黃郁庭" data-phone="0989-105-335" data-house="行銷"><td>0898105335</td><td>黃郁庭</td><td>0989-105-335</td><td><span class="house-tag">行銷</span></td></tr>
+                  <tr data-access-row data-card="0843123527" data-name="李俊廷" data-phone="0943-123-527" data-house="行銷"><td>0843123527</td><td>李俊廷</td><td>0943-123-527</td><td><span class="house-tag">行銷</span></td></tr>
+                  <tr data-access-row data-card="3738076647" data-name="高美玲" data-phone="0973-807-647" data-house="行銷"><td>3738076647</td><td>高美玲</td><td>0973-807-647</td><td><span class="house-tag">行銷</span></td></tr>
+                  <tr data-access-row data-card="3738801703" data-name="謝承恩" data-phone="0973-880-703" data-house="行銷"><td>3738801703</td><td>謝承恩</td><td>0973-880-703</td><td><span class="house-tag">行銷</span></td></tr>
+                  <tr data-access-row data-card="3739509479" data-name="周怡君" data-phone="0973-950-479" data-house="行銷"><td>3739509479</td><td>周怡君</td><td>0973-950-479</td><td><span class="house-tag">行銷</span></td></tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section class="access-panel access-selected" aria-label="已選清單">
+              <h2>已選清單</h2>
+              <table class="access-table">
+                <thead>
+                  <tr><th>卡號</th><th>客戶姓名</th><th>客戶手機</th><th>戶號別</th></tr>
+                </thead>
+                <tbody id="selectedAccessRows">
+                  <tr><td>3265708516</td><td>王志明</td><td>0912-305-816</td><td>劍榕</td></tr>
+                  <tr><td>0831011879</td><td>林佳蓉</td><td>0931-011-879</td><td>劍榕</td></tr>
+                </tbody>
+              </table>
+              <div class="access-actions">
+                <button type="button">上一步</button>
+                <button type="button">下一步</button>
+              </div>
+            </section>
+          </div>
+        </section>
+
         <section id="sensorView" class="view sensor-page" aria-label="感測器管理">
           <div class="sensor-heading">
             <div>
@@ -263,17 +326,17 @@
           <div class="sensor-table-card">
             <table class="sensor-table">
               <thead>
-                <tr><th>感測器編號</th><th>類型</th><th>位置</th><th>目前數值</th><th>電量</th><th>狀態</th><th>更新時間</th><th>操作</th></tr>
+                <tr><th>感測器編號</th><th>類型</th><th>位置</th><th>目前數值</th><th>狀態</th><th>更新時間</th><th>操作</th></tr>
               </thead>
               <tbody>
-                <tr><td>S-4F-001</td><td>玻璃破碎</td><td>4F 第三展廳</td><td>震動 78%</td><td>92%</td><td><span class="status-warn">警戒</span></td><td>2026.07.20 09:12</td><td><button>查看</button><button>校正</button></td></tr>
-                <tr><td>M-4F-012</td><td>磁簧</td><td>4F 第一展廳</td><td>D-12 開啟</td><td>86%</td><td><span class="status-warn">警戒</span></td><td>2026.07.20 09:10</td><td><button>查看</button><button>校正</button></td></tr>
-                <tr><td>T-2F-004</td><td>溫濕度</td><td>典藏庫房 No. 4</td><td>27.5°C / 60.1%RH</td><td>100%</td><td><span class="status-on">正常</span></td><td>2026.07.20 09:00</td><td><button>查看</button><button>校正</button></td></tr>
-                <tr><td>F-1F-002</td><td>煙霧偵測</td><td>1F 櫃檯</td><td>PM 12</td><td>78%</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:58</td><td><button>查看</button><button>校正</button></td></tr>
-                <tr><td>W-2F-003</td><td>淹水感測</td><td>2F 第二展廳</td><td>乾燥</td><td>81%</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:55</td><td><button>查看</button><button>校正</button></td></tr>
-                <tr><td>P-1F-018</td><td>人流感測</td><td>1F 特展區</td><td>496 人次</td><td>外接</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:50</td><td><button>查看</button><button>校正</button></td></tr>
-                <tr><td>P-2F-021</td><td>人流感測</td><td>2F 展覽廳二</td><td>328 人次</td><td>外接</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:48</td><td><button>查看</button><button>校正</button></td></tr>
-                <tr><td>F-3F-006</td><td>煙霧偵測</td><td>3F 文物櫃</td><td>離線</td><td>12%</td><td><span class="status-off">離線</span></td><td>2026.07.19 22:14</td><td><button>查看</button><button>更換</button></td></tr>
+                <tr><td>S-4F-001</td><td>玻璃破碎</td><td>4F 第三展廳</td><td>震動 78%</td><td><span class="status-warn">警戒</span></td><td>2026.07.20 09:12</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>M-4F-012</td><td>磁簧</td><td>4F 第一展廳</td><td>D-12 開啟</td><td><span class="status-warn">警戒</span></td><td>2026.07.20 09:10</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>T-2F-004</td><td>溫濕度</td><td>典藏庫房 No. 4</td><td>27.5°C / 60.1%RH</td><td><span class="status-on">正常</span></td><td>2026.07.20 09:00</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>F-1F-002</td><td>煙霧偵測</td><td>1F 櫃檯</td><td>PM 12</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:58</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>W-2F-003</td><td>淹水感測</td><td>2F 第二展廳</td><td>乾燥</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:55</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>P-1F-018</td><td>人流感測</td><td>1F 特展區</td><td>496 人次</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:50</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>P-2F-021</td><td>人流感測</td><td>2F 展覽廳二</td><td>328 人次</td><td><span class="status-on">正常</span></td><td>2026.07.20 08:48</td><td><button>查看</button><button>校正</button></td></tr>
+                <tr><td>F-3F-006</td><td>煙霧偵測</td><td>3F 文物櫃</td><td>離線</td><td><span class="status-off">離線</span></td><td>2026.07.19 22:14</td><td><button>查看</button><button>更換</button></td></tr>
               </tbody>
             </table>
           </div>
