@@ -902,10 +902,21 @@ td:nth-child(3) { text-align: left; }
 .security-page h2 { margin: 0; font-size: 44px; line-height: 1; }
 .security-layout {
   min-height: 0;
-  padding: 14px;
+  padding: 0;
+  background: #f7f7f6;
+  overflow: hidden;
+}
+.security-monitor-image,
+.security-layout svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.security-monitor-image {
+  object-fit: contain;
+  object-position: center;
   background: #f7f7f6;
 }
-.security-layout svg { width: 100%; height: 100%; display: block; }
 .security-layout rect, .security-layout path { fill: none; stroke: #34383a; stroke-width: 3; }
 .artifact rect { fill: #f7f7f6; stroke: #7b8083; }
 .artifact line { stroke: #222; stroke-width: 5; }
