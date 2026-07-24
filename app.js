@@ -66,6 +66,7 @@ const breadcrumbs = document.querySelector("#breadcrumbs");
 const tempValue = document.querySelector("#tempValue");
 const humidityValue = document.querySelector("#humidityValue");
 const selectedAccessRows = document.querySelector("#selectedAccessRows");
+let accessStep = 1;
 
 function setLoggedIn() {
   loginScreen.classList.add("is-hidden");
@@ -142,6 +143,37 @@ function renderSelectedAccess(row) {
   `;
 }
 
+function setAccessStep(step) {
+  accessStep = Math.max(1, Math.min(3, step));
+
+  document.querySelectorAll("[data-access-step]").forEach((panel) => {
+    panel.classList.toggle("is-active", Number(panel.dataset.accessStep) === accessStep);
+  });
+
+  document.querySelectorAll("[data-step-indicator]").forEach((indicator) => {
+    const stepNumber = Number(indicator.dataset.stepIndicator);
+    indicator.classList.toggle("is-active", stepNumber === accessStep);
+    indicator.classList.toggle("is-done", stepNumber < accessStep);
+  });
+}
+
+function showAccessSuccess(message = "門禁授權成功") {
+  let toast = document.querySelector("#accessToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "accessToast";
+    toast.className = "access-toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.innerHTML = `<strong>門禁授權</strong><span>${message}</span>`;
+  toast.classList.add("is-visible");
+  window.clearTimeout(showAccessSuccess.timer);
+  showAccessSuccess.timer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 2200);
+}
+
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(loginForm);
@@ -174,6 +206,34 @@ document.addEventListener("click", (event) => {
   const accessRow = event.target.closest("[data-access-row]");
   if (accessRow) {
     renderSelectedAccess(accessRow);
+  }
+
+  if (event.target.closest("[data-access-next]")) {
+    setAccessStep(accessStep + 1);
+  }
+
+  if (event.target.closest("[data-access-prev]")) {
+    setAccessStep(accessStep - 1);
+  }
+
+  const floorButton = event.target.closest("[data-floor]");
+  if (floorButton) {
+    document.querySelectorAll("[data-floor]").forEach((button) => {
+      button.classList.toggle("is-selected", button === floorButton);
+    });
+    const floorLabel = document.querySelector("#selectedFloorLabel");
+    if (floorLabel) floorLabel.textContent = floorButton.dataset.floor;
+  }
+
+  const timeButton = event.target.closest(".time-column button");
+  if (timeButton) {
+    document.querySelectorAll(".time-column button").forEach((button) => {
+      button.classList.toggle("is-selected", button === timeButton);
+    });
+  }
+
+  if (event.target.closest("[data-access-submit]")) {
+    showAccessSuccess("設定成功");
   }
 });
 

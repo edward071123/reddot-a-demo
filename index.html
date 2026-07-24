@@ -259,52 +259,89 @@
           </div>
 
           <div class="access-steps" aria-label="授權流程">
-            <div class="step is-active"><b>1</b><strong>Step 1</strong></div>
-            <div class="step"><b>2</b><strong>Step 2</strong></div>
-            <div class="step"><b>3</b><strong>Step 3</strong></div>
+            <div class="step is-active" data-step-indicator="1"><b>1</b><strong>Step 1</strong></div>
+            <div class="step" data-step-indicator="2"><b>2</b><strong>Step 2</strong></div>
+            <div class="step" data-step-indicator="3"><b>3</b><strong>Step 3</strong></div>
           </div>
 
           <div class="access-board">
-            <section class="access-panel access-source" aria-label="住戶清單">
-              <div class="access-search">
-                <label><span>⌕</span><input id="accessNameSearch" placeholder="請輸入搜尋客戶名稱" /></label>
-                <label><span>⌕</span><input id="accessPhoneSearch" placeholder="請輸入搜尋客戶手機" /></label>
-                <button id="accessSearchBtn" type="button">搜尋</button>
+            <section class="access-step-panel is-active" data-access-step="1" aria-label="Step 1 客戶清單">
+              <div class="access-step-one">
+                <section class="access-panel access-source" aria-label="住戶清單">
+                  <div class="access-search">
+                    <label><span>⌕</span><input id="accessNameSearch" placeholder="請輸入搜尋客戶名稱" /></label>
+                    <label><span>⌕</span><input id="accessPhoneSearch" placeholder="請輸入搜尋客戶手機" /></label>
+                    <button id="accessSearchBtn" type="button">搜尋</button>
+                  </div>
+                  <table class="access-table">
+                    <thead>
+                      <tr><th>卡號</th><th>客戶姓名</th><th>客戶手機</th><th>戶號別</th></tr>
+                    </thead>
+                    <tbody id="accessRows">
+                      <tr class="is-picked" data-access-row data-card="3265708516" data-name="王志明" data-phone="0912-305-816" data-house="劍榕"><td>3265708516</td><td>王志明</td><td>0912-305-816</td><td><span class="house-tag">劍榕</span></td></tr>
+                      <tr data-access-row data-card="0831011879" data-name="林佳蓉" data-phone="0931-011-879" data-house="劍榕"><td>0831011879</td><td>林佳蓉</td><td>0931-011-879</td><td><span class="house-tag">劍榕</span></td></tr>
+                      <tr data-access-row data-card="0839848711" data-name="陳建宏" data-phone="0939-848-711" data-house="劍榕"><td>0839848711</td><td>陳建宏</td><td>0939-848-711</td><td><span class="house-tag">劍榕</span></td></tr>
+                      <tr data-access-row data-card="0840222999" data-name="張雅婷" data-phone="0940-222-999" data-house="劍榕"><td>0840222999</td><td>張雅婷</td><td>0940-222-999</td><td><span class="house-tag">劍榕</span></td></tr>
+                      <tr data-access-row data-card="0830930759" data-name="許文凱" data-phone="0930-930-759" data-house="劍榕"><td>0830930759</td><td>許文凱</td><td>0930-930-759</td><td><span class="house-tag">劍榕</span></td></tr>
+                      <tr data-access-row data-card="0898105335" data-name="黃郁庭" data-phone="0989-105-335" data-house="行銷"><td>0898105335</td><td>黃郁庭</td><td>0989-105-335</td><td><span class="house-tag">行銷</span></td></tr>
+                      <tr data-access-row data-card="0843123527" data-name="李俊廷" data-phone="0943-123-527" data-house="行銷"><td>0843123527</td><td>李俊廷</td><td>0943-123-527</td><td><span class="house-tag">行銷</span></td></tr>
+                      <tr data-access-row data-card="3738076647" data-name="高美玲" data-phone="0973-807-647" data-house="行銷"><td>3738076647</td><td>高美玲</td><td>0973-807-647</td><td><span class="house-tag">行銷</span></td></tr>
+                      <tr data-access-row data-card="3738801703" data-name="謝承恩" data-phone="0973-880-703" data-house="行銷"><td>3738801703</td><td>謝承恩</td><td>0973-880-703</td><td><span class="house-tag">行銷</span></td></tr>
+                      <tr data-access-row data-card="3739509479" data-name="周怡君" data-phone="0973-950-479" data-house="行銷"><td>3739509479</td><td>周怡君</td><td>0973-950-479</td><td><span class="house-tag">行銷</span></td></tr>
+                    </tbody>
+                  </table>
+                </section>
+
+                <section class="access-panel access-selected" aria-label="已選清單">
+                  <h2>已選清單</h2>
+                  <table class="access-table">
+                    <thead>
+                      <tr><th>卡號</th><th>客戶姓名</th><th>客戶手機</th><th>戶號別</th></tr>
+                    </thead>
+                    <tbody id="selectedAccessRows">
+                      <tr class="empty-row"><td colspan="4">暫無資料</td></tr>
+                    </tbody>
+                  </table>
+                </section>
               </div>
-              <table class="access-table">
-                <thead>
-                  <tr><th>卡號</th><th>客戶姓名</th><th>客戶手機</th><th>戶號別</th></tr>
-                </thead>
-                <tbody id="accessRows">
-                  <tr class="is-picked" data-access-row data-card="3265708516" data-name="王志明" data-phone="0912-305-816" data-house="劍榕"><td>3265708516</td><td>王志明</td><td>0912-305-816</td><td><span class="house-tag">劍榕</span></td></tr>
-                  <tr data-access-row data-card="0831011879" data-name="林佳蓉" data-phone="0931-011-879" data-house="劍榕"><td>0831011879</td><td>林佳蓉</td><td>0931-011-879</td><td><span class="house-tag">劍榕</span></td></tr>
-                  <tr data-access-row data-card="0839848711" data-name="陳建宏" data-phone="0939-848-711" data-house="劍榕"><td>0839848711</td><td>陳建宏</td><td>0939-848-711</td><td><span class="house-tag">劍榕</span></td></tr>
-                  <tr data-access-row data-card="0840222999" data-name="張雅婷" data-phone="0940-222-999" data-house="劍榕"><td>0840222999</td><td>張雅婷</td><td>0940-222-999</td><td><span class="house-tag">劍榕</span></td></tr>
-                  <tr data-access-row data-card="0830930759" data-name="許文凱" data-phone="0930-930-759" data-house="劍榕"><td>0830930759</td><td>許文凱</td><td>0930-930-759</td><td><span class="house-tag">劍榕</span></td></tr>
-                  <tr data-access-row data-card="0898105335" data-name="黃郁庭" data-phone="0989-105-335" data-house="行銷"><td>0898105335</td><td>黃郁庭</td><td>0989-105-335</td><td><span class="house-tag">行銷</span></td></tr>
-                  <tr data-access-row data-card="0843123527" data-name="李俊廷" data-phone="0943-123-527" data-house="行銷"><td>0843123527</td><td>李俊廷</td><td>0943-123-527</td><td><span class="house-tag">行銷</span></td></tr>
-                  <tr data-access-row data-card="3738076647" data-name="高美玲" data-phone="0973-807-647" data-house="行銷"><td>3738076647</td><td>高美玲</td><td>0973-807-647</td><td><span class="house-tag">行銷</span></td></tr>
-                  <tr data-access-row data-card="3738801703" data-name="謝承恩" data-phone="0973-880-703" data-house="行銷"><td>3738801703</td><td>謝承恩</td><td>0973-880-703</td><td><span class="house-tag">行銷</span></td></tr>
-                  <tr data-access-row data-card="3739509479" data-name="周怡君" data-phone="0973-950-479" data-house="行銷"><td>3739509479</td><td>周怡君</td><td>0973-950-479</td><td><span class="house-tag">行銷</span></td></tr>
-                </tbody>
-              </table>
+              <div class="access-actions"><button type="button" disabled>上一步</button><button type="button" data-access-next>下一步</button></div>
             </section>
 
-            <section class="access-panel access-selected" aria-label="已選清單">
-              <h2>已選清單</h2>
-              <table class="access-table">
-                <thead>
-                  <tr><th>卡號</th><th>客戶姓名</th><th>客戶手機</th><th>戶號別</th></tr>
-                </thead>
-                <tbody id="selectedAccessRows">
-                  <tr><td>3265708516</td><td>王志明</td><td>0912-305-816</td><td>劍榕</td></tr>
-                  <tr><td>0831011879</td><td>林佳蓉</td><td>0931-011-879</td><td>劍榕</td></tr>
-                </tbody>
-              </table>
-              <div class="access-actions">
-                <button type="button">上一步</button>
-                <button type="button">下一步</button>
+            <section class="access-step-panel" data-access-step="2" aria-label="Step 2 電梯樓層">
+              <div class="access-step-two">
+                <aside class="floor-list" aria-label="住戶電梯樓層">
+                  <h2>住戶電梯</h2>
+                  <button class="is-selected" type="button" data-floor="B3F">B3F</button>
+                  <button type="button" data-floor="B2F">B2F</button>
+                  <button type="button" data-floor="B1F">B1F</button>
+                  <button type="button" data-floor="1F">1F</button>
+                  <button type="button" data-floor="2F">2F</button>
+                  <button type="button" data-floor="3F">3F</button>
+                  <button type="button" data-floor="4F">4F</button>
+                  <button type="button" data-floor="5F">5F</button>
+                </aside>
+                <section class="floor-target">
+                  <strong id="selectedFloorLabel">B3F</strong>
+                </section>
               </div>
+              <div class="access-actions"><button type="button" data-access-prev>上一步</button><button type="button" data-access-next>下一步</button></div>
+            </section>
+
+            <section class="access-step-panel" data-access-step="3" aria-label="Step 3 時段">
+              <div class="access-step-three">
+                <div class="time-column">
+                  <button type="button">全時段</button>
+                  <button type="button">臨時自動門時段</button>
+                </div>
+                <div class="time-column">
+                  <button type="button">門禁解除時段</button>
+                  <button class="is-selected" type="button">空白時段</button>
+                </div>
+                <div class="time-column">
+                  <button type="button">1F2F自動門解除時段</button>
+                </div>
+              </div>
+              <div class="access-actions"><button type="button" data-access-prev>上一步</button><button type="button" data-access-submit>送出</button></div>
             </section>
           </div>
         </section>
