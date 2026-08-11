@@ -1933,6 +1933,90 @@ td:nth-child(3) { text-align: left; }
   color: #7c8187;
 }
 
+#sensorView.is-ivs {
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+}
+
+#sensorView.is-ivs .sensor-management-head {
+  min-height: 185px;
+  align-items: start;
+  padding-top: 16px;
+}
+
+.sensor-ivs-panel {
+  min-height: 0;
+  overflow: auto;
+  padding-top: 6px;
+}
+
+.ivs-group {
+  margin-bottom: 22px;
+}
+
+.ivs-group h3 {
+  margin: 0 0 4px;
+  color: #8b9097;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.ivs-grid {
+  display: grid;
+  grid-template-columns: 150px 2.2fr 1.7fr 2fr 1.55fr 1.65fr 80px;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.ivs-head {
+  height: 28px;
+  background: #e2e2e2;
+  color: #32363a;
+  font-size: 21px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.ivs-row {
+  min-height: 86px;
+  color: #34383d;
+  font-size: 23px;
+  font-weight: 900;
+}
+
+.ivs-row strong {
+  font: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ivs-row > span,
+.ivs-row button {
+  justify-self: center;
+}
+
+.ivs-status {
+  width: 31px;
+  height: 31px;
+  display: block;
+  background: #303235;
+}
+
+.ivs-status.is-on {
+  background: #ff1828;
+}
+
+.ivs-row button {
+  border: 0;
+  padding: 0;
+  color: #5f6063;
+  background: transparent;
+  font-size: 32px;
+  line-height: 1;
+  transform: rotate(-8deg);
+}
+
 .sensor-modal {
   position: fixed;
   inset: 0;
@@ -1952,6 +2036,8 @@ td:nth-child(3) { text-align: left; }
   position: relative;
   width: min(824px, 86vw);
   min-height: min(820px, 88vh);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   gap: 28px;
@@ -1959,6 +2045,15 @@ td:nth-child(3) { text-align: left; }
   border-radius: 20px;
   background: #d3d6da;
   box-shadow: 0 22px 58px rgba(42,48,54,.28);
+}
+
+.sensor-modal-panel.is-temperature {
+  width: min(1010px, 88vw);
+  min-height: 0;
+  max-height: calc(100vh - 44px);
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 16px;
+  padding: 42px 62px 44px;
 }
 
 .sensor-modal-close {
@@ -2008,10 +2103,9 @@ td:nth-child(3) { text-align: left; }
   height: 44px;
 }
 
-.sensor-modal-panel label:nth-child(2) input {
-  height: 150px;
-  padding-top: 18px;
-  padding-bottom: 18px;
+.sensor-modal-panel.is-temperature > label > input {
+  height: 64px;
+  font-size: 34px;
 }
 
 .sensor-modal-panel textarea {
@@ -2019,6 +2113,94 @@ td:nth-child(3) { text-align: left; }
   resize: none;
   padding-top: 22px;
   line-height: 1.55;
+}
+
+.sensor-modal-panel.is-temperature textarea {
+  min-height: 168px;
+}
+
+.sensor-threshold-fields {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.sensor-threshold-fields[hidden] {
+  display: none;
+}
+
+.sensor-threshold-fields h3 {
+  margin: 0;
+  color: #2f3439;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.sensor-threshold-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 150px;
+  padding: 0 44px;
+}
+
+.sensor-threshold-grid label {
+  gap: 4px;
+  letter-spacing: 0;
+}
+
+.threshold-control {
+  height: 92px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  border: 3px solid #999;
+  border-radius: 20px;
+  padding: 0 14px 0 28px;
+  background: #fff;
+  font-style: normal;
+}
+
+.threshold-control input {
+  width: 100%;
+  height: auto;
+  border: 0;
+  padding: 0;
+  color: #8a8c91;
+  background: transparent;
+  font-size: 48px;
+  line-height: 1;
+  text-align: right;
+}
+
+.threshold-control small {
+  color: #8a8c91;
+  font-size: 40px;
+  font-weight: 900;
+}
+
+.threshold-control i {
+  margin-left: 22px;
+  color: #6d9a6e;
+  font-size: 34px;
+  font-style: normal;
+  line-height: .82;
+}
+
+.threshold-control.temp-high {
+  border-color: #d8232a;
+}
+
+.threshold-control.temp-low {
+  border-color: #28aee9;
+}
+
+.threshold-control.humidity-high {
+  border-color: #ff871d;
+}
+
+.threshold-control.humidity-low {
+  border-color: #35b957;
 }
 
 .sensor-modal-panel button:not(.sensor-modal-close) {

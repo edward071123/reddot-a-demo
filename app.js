@@ -84,6 +84,35 @@ const sensorDataByType = {
   ],
 };
 
+const ivsDetectionGroups = [
+  {
+    title: "遺留物偵測",
+    rows: [
+      ["off", "特展大廳1F 攝影機 No.182", "192.168.28.01", "攝影機No.180", "192.168.27.37", "遺留物偵測 30 秒"],
+      ["on", "2F大廳 攝影機 No.12", "192.168.28.21", "攝影機No.85", "192.168.27.02", "遺留物偵測 120 秒"],
+    ],
+  },
+  {
+    title: "遺失物偵測",
+    rows: [
+      ["on", "2F 展廳1 攝影機 No.182", "192.168.28.01", "攝影機No.23", "192.168.27.32", "遺失物偵測 30 秒"],
+      ["off", "2F 展廳1 攝影機 No.126", "192.168.28.61", "攝影機No.42", "192.168.27.17", "遺失物偵測 14 秒"],
+    ],
+  },
+  {
+    title: "徘徊偵測",
+    rows: [
+      ["off", "攝影機 No.122", "192.168.28.15", "攝影機No.57", "192.168.27.99", "徘徊偵測 120 秒"],
+    ],
+  },
+  {
+    title: "熱感應偵測",
+    rows: [
+      ["on", "3F機房攝影機 No.02", "192.168.28.28", "攝影機No.90", "192.168.27.36", "熱源偵測 50 度"],
+    ],
+  },
+];
+
 const viewMeta = {
   dashboard: {
     id: "dashboardView",
@@ -125,12 +154,28 @@ const sensorEditModal = document.querySelector("#sensorEditModal");
 const sensorEditZone = document.querySelector("#sensorEditZone");
 const sensorEditCode = document.querySelector("#sensorEditCode");
 const sensorEditNote = document.querySelector("#sensorEditNote");
+const sensorThresholdFields = document.querySelector("#sensorThresholdFields");
+const sensorTempHigh = document.querySelector("#sensorTempHigh");
+const sensorTempLow = document.querySelector("#sensorTempLow");
+const sensorHumidityHigh = document.querySelector("#sensorHumidityHigh");
+const sensorHumidityLow = document.querySelector("#sensorHumidityLow");
 const sensorTableBody = document.querySelector("#sensorView .sensor-table tbody");
+const sensorTableTools = document.querySelector("#sensorView .sensor-table-tools");
+const sensorTableWrap = document.querySelector("#sensorView .sensor-table-wrap");
+const sensorIvsPanel = document.querySelector("#sensorIvsPanel");
 const sensorHeaderCheckbox = document.querySelector("#sensorView .sensor-table thead input[type='checkbox']");
 const sensorPaginationCount = document.querySelector(".sensor-pagination > span");
+const sensorPagination = document.querySelector("#sensorView .sensor-pagination");
 let accessStep = 1;
 let editingSensorRow = null;
 let currentSensorType = "煙霧偵測";
+
+const defaultSensorThresholds = {
+  tempHigh: "25",
+  tempLow: "-01",
+  humidityHigh: "63",
+  humidityLow: "20",
+};
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (char) => ({
@@ -171,6 +216,17 @@ function renderSensors(type = currentSensorType) {
   if (!sensorTableBody) return;
 
   currentSensorType = sensorDataByType[type] ? type : "煙霧偵測";
+  const isIvs = currentSensorType === "IVS防盜";
+  document.querySelector("#sensorView")?.classList.toggle("is-ivs", isIvs);
+  if (sensorTableTools) sensorTableTools.hidden = isIvs;
+  if (sensorTableWrap) sensorTableWrap.hidden = isIvs;
+  if (sensorPagination) sensorPagination.hidden = isIvs;
+  if (sensorIvsPanel) sensorIvsPanel.hidden = !isIvs;
+  if (isIvs) {
+    renderIvsSensors();
+    return;
+  }
+
   const rows = sensorDataByType[currentSensorType];
 
   sensorTableBody.innerHTML = rows.map((row, index) => {
@@ -191,6 +247,39 @@ function renderSensors(type = currentSensorType) {
 
   if (sensorHeaderCheckbox) sensorHeaderCheckbox.checked = false;
   if (sensorPaginationCount) sensorPaginationCount.textContent = `第 1 至 ${rows.length} 筆 共 ${rows.length} 筆`;
+}
+
+function renderIvsSensors() {
+  if (!sensorIvsPanel) return;
+
+  sensorIvsPanel.innerHTML = ivsDetectionGroups.map((group) => `
+    <section class="ivs-group">
+      <h3>${escapeHtml(group.title)}</h3>
+      <div class="ivs-grid ivs-head">
+        <span>警報啟動</span>
+        <span>IVS攝影機</span>
+        <span>位址</span>
+        <span>輔助角度攝影機</span>
+        <span>位址</span>
+        <span>偵測警戒值</span>
+        <span></span>
+      </div>
+      ${group.rows.map((row) => {
+        const [status, camera, address, assistCamera, assistAddress, threshold] = row.map(escapeHtml);
+        return `
+          <div class="ivs-grid ivs-row">
+            <span><i class="ivs-status ${status === "on" ? "is-on" : ""}"></i></span>
+            <strong>${camera}</strong>
+            <strong>${address}</strong>
+            <strong>${assistCamera}</strong>
+            <strong>${assistAddress}</strong>
+            <strong>${threshold}</strong>
+            <button type="button" aria-label="編輯 ${camera}">✎</button>
+          </div>
+        `;
+      }).join("")}
+    </section>
+  `).join("");
 }
 
 function exportCsv() {
@@ -288,10 +377,23 @@ function openSensorEditModal(row) {
   if (!sensorEditModal || !row) return;
 
   const cells = row.querySelectorAll("td");
+  const rowIndex = Number(row.dataset.sensorIndex);
+  const rowData = sensorDataByType[currentSensorType]?.[rowIndex];
+  const isTemperature = currentSensorType === "溫濕度感測";
+  const thresholds = rowData?.[6] || defaultSensorThresholds;
+
   editingSensorRow = row;
   sensorEditZone.value = cells[1]?.textContent.trim() || "";
   sensorEditCode.value = cells[2]?.textContent.trim() || "";
   sensorEditNote.value = cells[6]?.textContent.trim() || "";
+  sensorEditModal.querySelector(".sensor-modal-panel")?.classList.toggle("is-temperature", isTemperature);
+  if (sensorThresholdFields) sensorThresholdFields.hidden = !isTemperature;
+  if (isTemperature) {
+    sensorTempHigh.value = thresholds.tempHigh;
+    sensorTempLow.value = thresholds.tempLow;
+    sensorHumidityHigh.value = thresholds.humidityHigh;
+    sensorHumidityLow.value = thresholds.humidityLow;
+  }
   sensorEditModal.classList.add("is-visible");
   sensorEditModal.setAttribute("aria-hidden", "false");
   sensorEditZone.focus();
@@ -411,6 +513,14 @@ sensorEditModal?.querySelector("form")?.addEventListener("submit", (event) => {
     rowData[0] = sensorEditZone.value.trim();
     rowData[1] = sensorEditCode.value.trim();
     rowData[5] = sensorEditNote.value.trim();
+    if (currentSensorType === "溫濕度感測") {
+      rowData[6] = {
+        tempHigh: sensorTempHigh.value.trim(),
+        tempLow: sensorTempLow.value.trim(),
+        humidityHigh: sensorHumidityHigh.value.trim(),
+        humidityLow: sensorHumidityLow.value.trim(),
+      };
+    }
   }
 
   const cells = editingSensorRow.querySelectorAll("td");

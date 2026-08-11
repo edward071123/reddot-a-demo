@@ -391,6 +391,8 @@
             </table>
           </div>
 
+          <div id="sensorIvsPanel" class="sensor-ivs-panel" hidden></div>
+
           <div class="sensor-pagination">
             <span>第 1 至 8 筆 共 8 筆</span>
             <nav aria-label="感測器頁碼">
@@ -414,6 +416,27 @@
           <span>設 備 編 碼</span>
           <input id="sensorEditCode" name="code" />
         </label>
+        <section id="sensorThresholdFields" class="sensor-threshold-fields" hidden>
+          <h3>警報觸發 | 警戒值設定</h3>
+          <div class="sensor-threshold-grid">
+            <label>
+              <span>溫度上限</span>
+              <b class="threshold-control temp-high"><input id="sensorTempHigh" inputmode="numeric" value="25" /><small>°C</small><i>▲<br />▼</i></b>
+            </label>
+            <label>
+              <span>濕度上限</span>
+              <b class="threshold-control humidity-high"><input id="sensorHumidityHigh" inputmode="numeric" value="63" /><small>%</small><i>▲<br />▼</i></b>
+            </label>
+            <label>
+              <span>溫度下限</span>
+              <b class="threshold-control temp-low"><input id="sensorTempLow" inputmode="numeric" value="-01" /><small>°C</small><i>▲<br />▼</i></b>
+            </label>
+            <label>
+              <span>濕度下限</span>
+              <b class="threshold-control humidity-low"><input id="sensorHumidityLow" inputmode="numeric" value="20" /><small>%</small><i>▲<br />▼</i></b>
+            </label>
+          </div>
+        </section>
         <label>
           <span>設備描述 / 備註</span>
           <textarea id="sensorEditNote" name="note"></textarea>
