@@ -29,6 +29,61 @@ const roomReadings = {
   8: { temp: "27.3", humidity: "59.7" },
 };
 
+const sensorDataByType = {
+  "煙霧偵測": [
+    ["Zone 1 Lobby", "S-D 001", "2026.08.25", "03:00", "高", "展廳出入口"],
+    ["Zone 1 Lobby", "S-D 002", "2026.06.01", "21:00", "低", "重點文物區"],
+    ["Zone 2 @ 2F", "S-D 003", "2026.06.01", "21:00", "低", "重點文物區"],
+    ["Zone 2 @ 2F", "S-D 004", "2026.09.01", "03:21", "中", "展館出口"],
+    ["Zone 3 @ 2F", "S-D 005", "2026.09.30", "13:26", "高", "管理權限者自由備註"],
+    ["Zone 3 @ 2F", "S-D 006", "2026.07.14", "21:25", "低", "管理權限者自由備註"],
+    ["Zone 3 @ 2F", "S-D 007", "2026.06.01", "12:23", "低", "主要展演廳"],
+    ["Zone 4 @ 4F", "S-D 008", "2026.06.04", "04:10", "高", "陳列櫃"],
+  ],
+  "水位感測器": [
+    ["B1 Pump Room", "W-L 001", "2026.08.20", "02:15", "高", "地下室集水井"],
+    ["B2 Storage", "W-L 002", "2026.07.18", "18:42", "中", "典藏庫房排水口"],
+    ["Zone 1 Lobby", "W-L 003", "2026.06.22", "09:05", "低", "入口水位監測"],
+    ["Zone 2 @ 2F", "W-L 004", "2026.05.30", "23:12", "低", "消防管線旁"],
+  ],
+  "玻璃破碎": [
+    ["Zone 1 Lobby", "G-B 001", "2026.08.11", "10:32", "中", "售票櫃台玻璃"],
+    ["Zone 2 @ 2F", "G-B 002", "2026.08.02", "14:18", "低", "展櫃側面玻璃"],
+    ["Zone 3 @ 2F", "G-B 003", "2026.07.25", "03:44", "高", "主要展演廳展示櫃"],
+    ["Zone 4 @ 4F", "G-B 004", "2026.07.01", "11:09", "低", "陳列櫃玻璃門"],
+  ],
+  "震波感測器": [
+    ["Zone 1 Lobby", "V-S 001", "2026.08.08", "07:35", "低", "入口牆面震動"],
+    ["Zone 2 @ 2F", "V-S 002", "2026.07.29", "22:40", "中", "重點文物展台"],
+    ["Zone 3 @ 2F", "V-S 003", "2026.07.12", "16:21", "高", "大型展品底座"],
+    ["Zone 4 @ 4F", "V-S 004", "2026.06.15", "05:12", "低", "外牆側震動點"],
+  ],
+  "刷卡機": [
+    ["Zone 1 Lobby", "C-R 001", "2026.08.25", "09:18", "高", "員工入口刷卡機"],
+    ["Zone 2 @ 2F", "C-R 002", "2026.08.20", "19:33", "中", "管制門刷卡機"],
+    ["Zone 3 @ 2F", "C-R 003", "2026.07.07", "08:44", "低", "庫房入口"],
+    ["Zone 4 @ 4F", "C-R 004", "2026.06.19", "21:10", "低", "維修通道"],
+  ],
+  "溫濕度感測": [
+    ["Storage No. 1", "T-H 001", "2026.08.30", "13:20", "中", "典藏庫房溫濕度"],
+    ["Storage No. 2", "T-H 002", "2026.08.22", "06:50", "低", "紙本文物區"],
+    ["Zone 2 @ 2F", "T-H 003", "2026.07.16", "15:31", "低", "特展區環境監測"],
+    ["Zone 3 @ 2F", "T-H 004", "2026.07.02", "04:05", "高", "恆溫櫃異常紀錄"],
+  ],
+  "磁簧防盜": [
+    ["Zone 1 Lobby", "M-R 001", "2026.08.18", "01:27", "高", "出入口門磁"],
+    ["Zone 2 @ 2F", "M-R 002", "2026.08.03", "20:15", "中", "展櫃門磁"],
+    ["Zone 3 @ 2F", "M-R 003", "2026.07.12", "12:38", "低", "維修門磁簧"],
+    ["Zone 4 @ 4F", "M-R 004", "2026.06.28", "03:19", "低", "陳列櫃門磁"],
+  ],
+  "IVS防盜": [
+    ["Zone 1 Lobby", "I-V 001", "2026.08.21", "23:55", "高", "入口跨線偵測"],
+    ["Zone 2 @ 2F", "I-V 002", "2026.08.10", "17:20", "中", "展區逗留偵測"],
+    ["Zone 3 @ 2F", "I-V 003", "2026.07.19", "02:43", "高", "主要展演廳入侵偵測"],
+    ["Zone 4 @ 4F", "I-V 004", "2026.06.12", "12:11", "低", "管制區影像分析"],
+  ],
+};
+
 const viewMeta = {
   dashboard: {
     id: "dashboardView",
@@ -52,7 +107,7 @@ const viewMeta = {
   },
   sensor: {
     id: "sensorView",
-    crumb: "Sensor 感測器管理",
+    crumb: "感應器管理",
   },
 };
 
@@ -66,7 +121,26 @@ const breadcrumbs = document.querySelector("#breadcrumbs");
 const tempValue = document.querySelector("#tempValue");
 const humidityValue = document.querySelector("#humidityValue");
 const selectedAccessRows = document.querySelector("#selectedAccessRows");
+const sensorEditModal = document.querySelector("#sensorEditModal");
+const sensorEditZone = document.querySelector("#sensorEditZone");
+const sensorEditCode = document.querySelector("#sensorEditCode");
+const sensorEditNote = document.querySelector("#sensorEditNote");
+const sensorTableBody = document.querySelector("#sensorView .sensor-table tbody");
+const sensorHeaderCheckbox = document.querySelector("#sensorView .sensor-table thead input[type='checkbox']");
+const sensorPaginationCount = document.querySelector(".sensor-pagination > span");
 let accessStep = 1;
+let editingSensorRow = null;
+let currentSensorType = "煙霧偵測";
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[char]));
+}
 
 function setLoggedIn() {
   loginScreen.classList.add("is-hidden");
@@ -91,6 +165,32 @@ function renderAlarms(filter = "") {
     const cells = row.map((cell) => `<td>${cell}</td>`).join("");
     return `<tr>${cells}<td><span class="mail-cell" aria-label="已發送"></span></td></tr>`;
   }).join("");
+}
+
+function renderSensors(type = currentSensorType) {
+  if (!sensorTableBody) return;
+
+  currentSensorType = sensorDataByType[type] ? type : "煙霧偵測";
+  const rows = sensorDataByType[currentSensorType];
+
+  sensorTableBody.innerHTML = rows.map((row, index) => {
+    const [zone, code, date, time, frequency, note] = row.map(escapeHtml);
+    return `
+      <tr data-sensor-type="${escapeHtml(currentSensorType)}" data-sensor-index="${index}">
+        <td><input type="checkbox" aria-label="選取 ${code}" /></td>
+        <td>${zone}</td>
+        <td>${code}</td>
+        <td>${date}</td>
+        <td>${time}</td>
+        <td>${frequency}</td>
+        <td>${note}</td>
+        <td><button type="button" aria-label="編輯 ${code}">✎</button></td>
+      </tr>
+    `;
+  }).join("");
+
+  if (sensorHeaderCheckbox) sensorHeaderCheckbox.checked = false;
+  if (sensorPaginationCount) sensorPaginationCount.textContent = `第 1 至 ${rows.length} 筆 共 ${rows.length} 筆`;
 }
 
 function exportCsv() {
@@ -126,20 +226,31 @@ function setRoomReading(roomId) {
   });
 }
 
-function renderSelectedAccess(row) {
-  if (!selectedAccessRows || !row) return;
+function renderSelectedAccess() {
+  if (!selectedAccessRows) return;
 
-  document.querySelectorAll("[data-access-row]").forEach((item) => {
-    item.classList.toggle("is-picked", item === row);
-  });
+  const pickedRows = [...document.querySelectorAll("[data-access-row].is-picked")];
 
-  selectedAccessRows.innerHTML = `
+  if (!pickedRows.length) {
+    selectedAccessRows.innerHTML = `<tr class="empty-row"><td colspan="3">暫無資料</td></tr>`;
+    return;
+  }
+
+  selectedAccessRows.innerHTML = pickedRows.map((row) => `
     <tr>
       <td>${row.dataset.card}</td>
       <td>${row.dataset.name}</td>
       <td>${row.dataset.phone}</td>
     </tr>
-  `;
+  `).join("");
+}
+
+function toggleAccessRow(row) {
+  if (!row) return;
+
+  row.classList.toggle("is-picked");
+  row.setAttribute("aria-checked", String(row.classList.contains("is-picked")));
+  renderSelectedAccess();
 }
 
 function setAccessStep(step) {
@@ -173,6 +284,27 @@ function showAccessSuccess(message = "門禁授權成功") {
   }, 2200);
 }
 
+function openSensorEditModal(row) {
+  if (!sensorEditModal || !row) return;
+
+  const cells = row.querySelectorAll("td");
+  editingSensorRow = row;
+  sensorEditZone.value = cells[1]?.textContent.trim() || "";
+  sensorEditCode.value = cells[2]?.textContent.trim() || "";
+  sensorEditNote.value = cells[6]?.textContent.trim() || "";
+  sensorEditModal.classList.add("is-visible");
+  sensorEditModal.setAttribute("aria-hidden", "false");
+  sensorEditZone.focus();
+}
+
+function closeSensorEditModal() {
+  if (!sensorEditModal) return;
+
+  sensorEditModal.classList.remove("is-visible");
+  sensorEditModal.setAttribute("aria-hidden", "true");
+  editingSensorRow = null;
+}
+
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(loginForm);
@@ -204,7 +336,7 @@ document.addEventListener("click", (event) => {
 
   const accessRow = event.target.closest("[data-access-row]");
   if (accessRow) {
-    renderSelectedAccess(accessRow);
+    toggleAccessRow(accessRow);
   }
 
   if (event.target.closest("[data-access-next]")) {
@@ -231,9 +363,67 @@ document.addEventListener("click", (event) => {
     });
   }
 
+  const sensorTypeButton = event.target.closest(".sensor-type-tabs button");
+  if (sensorTypeButton) {
+    document.querySelectorAll(".sensor-type-tabs button").forEach((button) => {
+      button.classList.toggle("is-active", button === sensorTypeButton);
+    });
+    renderSensors(sensorTypeButton.textContent.trim());
+  }
+
+  if (event.target.closest(".sensor-table-tools > button")) {
+    document.querySelectorAll("#sensorView .sensor-table tbody input[type='checkbox']").forEach((checkbox) => {
+      checkbox.checked = true;
+    });
+  }
+
+  const sensorEditButton = event.target.closest("#sensorView .sensor-table tbody td:last-child button");
+  if (sensorEditButton) {
+    openSensorEditModal(sensorEditButton.closest("tr"));
+  }
+
+  if (event.target === sensorEditModal) {
+    closeSensorEditModal();
+  }
+
+  if (event.target.closest(".sensor-modal-close")) {
+    closeSensorEditModal();
+  }
+
   if (event.target.closest("[data-access-submit]")) {
     showAccessSuccess("設定成功");
   }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && sensorEditModal?.classList.contains("is-visible")) {
+    closeSensorEditModal();
+  }
+});
+
+sensorEditModal?.querySelector("form")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!editingSensorRow) return;
+
+  const rowIndex = Number(editingSensorRow.dataset.sensorIndex);
+  const rowData = sensorDataByType[currentSensorType]?.[rowIndex];
+  if (rowData) {
+    rowData[0] = sensorEditZone.value.trim();
+    rowData[1] = sensorEditCode.value.trim();
+    rowData[5] = sensorEditNote.value.trim();
+  }
+
+  const cells = editingSensorRow.querySelectorAll("td");
+  cells[1].textContent = sensorEditZone.value.trim();
+  cells[2].textContent = sensorEditCode.value.trim();
+  cells[6].textContent = sensorEditNote.value.trim();
+  closeSensorEditModal();
+});
+
+sensorHeaderCheckbox?.addEventListener("change", (event) => {
+  document.querySelectorAll("#sensorView .sensor-table tbody input[type='checkbox']").forEach((checkbox) => {
+    checkbox.checked = event.target.checked;
+  });
 });
 
 if (alarmType) {
@@ -246,3 +436,5 @@ if (exportBtn) {
 }
 
 renderAlarms();
+renderSelectedAccess();
+renderSensors();

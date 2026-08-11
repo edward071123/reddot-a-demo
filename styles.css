@@ -1701,3 +1701,374 @@ td:nth-child(3) { text-align: left; }
   color: white !important;
   background: #f36c61 !important;
 }
+
+#sensorView.sensor-page.is-current {
+  display: grid !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto !important;
+  gap: 0 !important;
+  padding: 0 36px 22px !important;
+  background: #fbfbfc !important;
+  color: #8d9298 !important;
+}
+
+.sensor-type-tabs {
+  display: flex;
+  align-items: end;
+  height: 66px;
+  border-bottom: 1px solid #d9dde0;
+  overflow-x: auto;
+}
+
+.sensor-type-tabs button {
+  height: 54px;
+  border: 1px solid #cdced1;
+  border-left: 0;
+  border-bottom: 0;
+  padding: 0 15px;
+  color: #8d8f93;
+  background: #eeeeef;
+  font-size: 15px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.sensor-type-tabs button:first-child {
+  border-left: 1px solid #cdced1;
+}
+
+.sensor-type-tabs button.is-active {
+  border-top: 5px solid #f3bd18;
+  background: #fff;
+  color: #7e858c;
+}
+
+.sensor-management-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  min-height: 130px;
+  padding-top: 16px;
+}
+
+.sensor-management-head h2 {
+  justify-self: end;
+  margin: 0 28px 0 0;
+  color: #8a8f96;
+  font-size: clamp(24px, 1.7vw, 34px);
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.sensor-management-head h2 span {
+  margin: 0 10px;
+}
+
+.sensor-management-head button,
+.sensor-table-tools > button {
+  border: 0;
+  border-radius: 28px;
+  color: #fff;
+  background: #34796e;
+  font-weight: 900;
+  letter-spacing: 4px;
+  white-space: nowrap;
+}
+
+.sensor-management-head button {
+  min-width: 258px;
+  height: 72px;
+  font-size: 26px;
+}
+
+.sensor-table-tools {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 36px;
+  height: 70px;
+  margin-bottom: 18px;
+}
+
+.sensor-table-tools label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #7b8086;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.sensor-table-tools select {
+  width: 88px;
+  height: 42px;
+  border: 1px solid #cfd3d8;
+  border-radius: 4px;
+  padding: 0 12px;
+  color: #737980;
+  background: #fff;
+  font-size: 16px;
+}
+
+.sensor-table-tools > button {
+  justify-self: start;
+  min-width: 226px;
+  height: 72px;
+  background: #a6a8ab;
+  font-size: 28px;
+}
+
+.sensor-table-wrap {
+  min-height: 0;
+  overflow: auto;
+}
+
+#sensorView .sensor-table {
+  width: 100% !important;
+  height: auto !important;
+  min-width: 1160px !important;
+  border: 0 !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+  background: #fff !important;
+  color: #8e9399 !important;
+}
+
+#sensorView .sensor-table th {
+  height: 44px !important;
+  padding: 8px 10px !important;
+  border: 0 !important;
+  background: #ececee !important;
+  color: #3e4246 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+#sensorView .sensor-table th:not(:first-child)::after {
+  content: "▲";
+  margin-left: 12px;
+  color: #d8dadd;
+  font-size: 10px;
+}
+
+#sensorView .sensor-table th:nth-child(1) { width: 58px; }
+#sensorView .sensor-table th:nth-child(2) { width: 210px; }
+#sensorView .sensor-table th:nth-child(3) { width: 150px; }
+#sensorView .sensor-table th:nth-child(4) { width: 150px; }
+#sensorView .sensor-table th:nth-child(5) { width: 140px; }
+#sensorView .sensor-table th:nth-child(6) { width: 130px; }
+#sensorView .sensor-table th:nth-child(8) { width: 92px; }
+
+#sensorView .sensor-table td {
+  height: 66px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  color: #8f949a !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sensorView .sensor-table tbody tr:nth-child(odd) {
+  background: #dedede !important;
+}
+
+#sensorView .sensor-table tbody tr:nth-child(even) {
+  background: #fff !important;
+}
+
+#sensorView .sensor-table td:nth-child(2),
+#sensorView .sensor-table td:nth-child(7) {
+  text-align: left !important;
+}
+
+#sensorView .sensor-table input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #34796e;
+}
+
+#sensorView .sensor-table td button {
+  border: 0 !important;
+  padding: 0 !important;
+  color: #5f6063 !important;
+  background: transparent !important;
+  font-size: 32px !important;
+  line-height: 1 !important;
+  transform: rotate(-8deg);
+}
+
+.sensor-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  color: #777d84;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.sensor-pagination nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sensor-pagination button {
+  min-width: 46px;
+  height: 38px;
+  border: 0;
+  color: #9a9da1;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.sensor-pagination button.is-current {
+  background: #f2f3f5;
+  color: #7c8187;
+}
+
+.sensor-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 34px;
+  background: rgba(232,235,238,.78);
+}
+
+.sensor-modal.is-visible {
+  display: flex;
+}
+
+.sensor-modal-panel {
+  position: relative;
+  width: min(824px, 86vw);
+  min-height: min(820px, 88vh);
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+  padding: 42px 52px 92px;
+  border-radius: 20px;
+  background: #d3d6da;
+  box-shadow: 0 22px 58px rgba(42,48,54,.28);
+}
+
+.sensor-modal-close {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: #4f5f5d;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 38px;
+  box-shadow: 0 8px 18px rgba(50,60,58,.22);
+}
+
+.sensor-modal-close:hover {
+  background: #2f7970;
+}
+
+.sensor-modal-panel label {
+  display: grid;
+  gap: 10px;
+  color: #2f3439;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 4px;
+}
+
+.sensor-modal-panel input,
+.sensor-modal-panel textarea {
+  width: 100%;
+  border: 0;
+  padding: 0 22px;
+  color: #5f666e;
+  background: #fdfdfd;
+  font: inherit;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0;
+  outline: none;
+}
+
+.sensor-modal-panel input {
+  height: 44px;
+}
+
+.sensor-modal-panel label:nth-child(2) input {
+  height: 150px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.sensor-modal-panel textarea {
+  min-height: 326px;
+  resize: none;
+  padding-top: 22px;
+  line-height: 1.55;
+}
+
+.sensor-modal-panel button:not(.sensor-modal-close) {
+  justify-self: end;
+  width: 220px;
+  height: 70px;
+  border: 0;
+  border-radius: 26px;
+  color: #fff;
+  background: #8d9095;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 6px;
+}
+
+@media (max-width: 900px) {
+  #sensorView.sensor-page.is-current {
+    padding: 0 18px 18px !important;
+  }
+
+  .sensor-management-head {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 24px 0 10px;
+  }
+
+  .sensor-management-head h2,
+  .sensor-management-head button {
+    justify-self: start;
+  }
+
+  .sensor-table-tools {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 14px;
+    padding-bottom: 16px;
+  }
+
+  .sensor-modal {
+    padding: 18px;
+  }
+
+  .sensor-modal-panel {
+    width: 100%;
+    min-height: auto;
+    padding: 28px 24px 34px;
+  }
+
+  .sensor-modal-panel button:not(.sensor-modal-close) {
+    justify-self: stretch;
+    width: auto;
+  }
+}
