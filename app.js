@@ -29,6 +29,95 @@ const roomReadings = {
   8: { temp: "27.3", humidity: "59.7" },
 };
 
+const calendarMonthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+const calendarWeekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+
+const calendarTypeMeta = {
+  workday: { label: "工作日", className: "is-workday" },
+  holiday: { label: "國定/例假日", className: "is-holiday" },
+  flex: { label: "彈性放假", className: "is-flex" },
+  makeup: { label: "補班日", className: "is-makeup" },
+};
+
+const calendarEvents = {
+  "2026-01-01": { type: "holiday", note: "元旦" },
+  "2026-01-31": { type: "makeup", note: "春節前上班" },
+  "2026-02-07": { type: "makeup", note: "春節前上班" },
+  "2026-02-16": { type: "flex", note: "春節彈性放假" },
+  "2026-02-17": { type: "holiday", note: "除夕" },
+  "2026-02-18": { type: "holiday", note: "春節" },
+  "2026-02-19": { type: "holiday", note: "春節" },
+  "2026-02-20": { type: "holiday", note: "春節" },
+  "2026-04-03": { type: "holiday", note: "兒童節補假" },
+  "2026-04-05": { type: "holiday", note: "清明節" },
+  "2026-06-19": { type: "holiday", note: "端午節" },
+  "2026-09-25": { type: "holiday", note: "中秋節" },
+  "2026-10-09": { type: "holiday", note: "國慶日補假" },
+};
+
+const securityAlerts = [
+  {
+    type: "磁簧開啟",
+    location: "4F 第三展廳",
+    message: "展示櫃門位異常開啟，請前往查看。",
+    channel: "CH 1",
+    statusId: "securityDoorStatus",
+    marker: { x: 24, y: 28 },
+  },
+  {
+    type: "煙霧偵測",
+    location: "4F 第一展廳",
+    message: "展櫃上方煙霧數值異常，已觸發警戒。",
+    channel: "CH 2",
+    statusId: "securitySmokeStatus",
+    marker: { x: 71, y: 34 },
+  },
+  {
+    type: "玻璃破碎",
+    location: "2F 展覽廳二",
+    message: "玻璃破碎感測器回報高頻震動。",
+    channel: "CH 4",
+    statusId: "securityGlassStatus",
+    marker: { x: 58, y: 69 },
+  },
+  {
+    type: "淹水警報",
+    location: "B1 機房通道",
+    message: "地面水位感測器觸發，請派員確認。",
+    channel: "CH 6",
+    statusId: "securityFloodStatus",
+    marker: { x: 15, y: 74 },
+  },
+  {
+    type: "電子圍籬跨越",
+    location: "4F 展館3-2",
+    message: "警戒線跨越事件，監控畫面已鎖定。",
+    channel: "CH 1",
+    statusId: "securityDoorStatus",
+    marker: { x: 42, y: 44 },
+  },
+];
+
+const securityCameraPositions = [
+  { x: 3, y: 6 },
+  { x: 57, y: 6 },
+  { x: 4, y: 48 },
+  { x: 58, y: 47 },
+];
+
+let calendarYear = 2026;
+let calendarMonth = 0;
+let calendarWeekendGenerated = false;
+let editingCalendarDate = "2026-01-01";
+let securityAlertTimer = null;
+let securityAlertAnimationTimer = null;
+let currentSecurityAlertIndex = -1;
+let currentSecurityCameraPositionIndex = -1;
+
 const sensorDataByType = {
   "煙霧偵測": [
     ["Zone 1 Lobby", "S-D 001", "2026.08.25", "03:00", "高", "展廳出入口"],
@@ -134,6 +223,10 @@ const viewMeta = {
     id: "accessView",
     crumb: "門禁管理 / 門禁授權",
   },
+  calendar: {
+    id: "calendarView",
+    crumb: "單位管理 / 萬年曆",
+  },
   sensor: {
     id: "sensorView",
     crumb: "感應器管理",
@@ -150,6 +243,15 @@ const breadcrumbs = document.querySelector("#breadcrumbs");
 const tempValue = document.querySelector("#tempValue");
 const humidityValue = document.querySelector("#humidityValue");
 const selectedAccessRows = document.querySelector("#selectedAccessRows");
+const securityCameraAlert = document.querySelector("#securityCameraAlert");
+const securityAlarmType = document.querySelector("#securityAlarmType");
+const securityAlarmLocation = document.querySelector("#securityAlarmLocation");
+const securityAlarmMessage = document.querySelector("#securityAlarmMessage");
+const securityAlarmTime = document.querySelector("#securityAlarmTime");
+const securityCameraChannel = document.querySelector("#securityCameraChannel");
+const securityAlertSummary = document.querySelector("#securityAlertSummary");
+const securityMapMarker = document.querySelector("#securityMapMarker");
+const securityMapMarkerLabel = document.querySelector("#securityMapMarkerLabel");
 const sensorEditModal = document.querySelector("#sensorEditModal");
 const sensorEditZone = document.querySelector("#sensorEditZone");
 const sensorEditCode = document.querySelector("#sensorEditCode");
@@ -166,6 +268,14 @@ const sensorIvsPanel = document.querySelector("#sensorIvsPanel");
 const sensorHeaderCheckbox = document.querySelector("#sensorView .sensor-table thead input[type='checkbox']");
 const sensorPaginationCount = document.querySelector(".sensor-pagination > span");
 const sensorPagination = document.querySelector("#sensorView .sensor-pagination");
+const calendarYearInput = document.querySelector("#calendarYear");
+const calendarGrid = document.querySelector("#calendarGrid");
+const calendarMonthTitle = document.querySelector("#calendarMonthTitle");
+const calendarListRows = document.querySelector("#calendarListRows");
+const calendarModal = document.querySelector("#calendarModal");
+const calendarModalTitle = document.querySelector("#calendarModalTitle");
+const calendarDateInput = document.querySelector("#calendarDateInput");
+const calendarNoteInput = document.querySelector("#calendarNoteInput");
 let accessStep = 1;
 let editingSensorRow = null;
 let currentSensorType = "煙霧偵測";
@@ -191,6 +301,7 @@ function setLoggedIn() {
   loginScreen.classList.add("is-hidden");
   appShell.classList.remove("is-hidden");
   showView("dashboard");
+  startSecurityAlertSimulation();
 }
 
 function showView(name) {
@@ -201,6 +312,9 @@ function showView(name) {
     item.classList.toggle("is-active", item.dataset.view === name);
   });
   breadcrumbs.innerHTML = `<button type="button" data-home>首頁</button><span> / ${meta.crumb}</span>`;
+  if (name === "security") {
+    triggerRandomSecurityAlert();
+  }
 }
 
 function renderAlarms(filter = "") {
@@ -282,6 +396,175 @@ function renderIvsSensors() {
   `).join("");
 }
 
+function formatCalendarDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getCalendarMeta(dateKey, date) {
+  const customEvent = calendarEvents[dateKey];
+  if (customEvent) {
+    return {
+      ...calendarTypeMeta[customEvent.type],
+      type: customEvent.type,
+      note: customEvent.note,
+    };
+  }
+
+  if (calendarWeekendGenerated && (date.getDay() === 0 || date.getDay() === 6)) {
+    return {
+      ...calendarTypeMeta.holiday,
+      type: "holiday",
+      note: "例假日",
+    };
+  }
+
+  return {
+    ...calendarTypeMeta.workday,
+    type: "workday",
+    note: "工作日",
+  };
+}
+
+function renderCalendar() {
+  if (!calendarGrid || !calendarMonthTitle) return;
+
+  calendarMonthTitle.textContent = `${calendarYear} ${calendarMonthNames[calendarMonth]}`;
+  if (calendarYearInput) calendarYearInput.value = String(calendarYear);
+  const batchButton = document.querySelector("#calendarBatchBtn");
+  if (batchButton && !batchButton.textContent.startsWith("已產生")) {
+    batchButton.textContent = `批次產生 ${calendarYear} 全年週末例假日`;
+  }
+  if (batchButton && batchButton.textContent.startsWith("已產生")) {
+    batchButton.textContent = `已產生 ${calendarYear} 全年週末例假日`;
+  }
+
+  const firstDay = new Date(calendarYear, calendarMonth, 1);
+  const startDate = new Date(calendarYear, calendarMonth, 1 - firstDay.getDay());
+  const cells = [];
+
+  for (let index = 0; index < 42; index += 1) {
+    const cellDate = new Date(startDate);
+    cellDate.setDate(startDate.getDate() + index);
+    const dateKey = formatCalendarDate(cellDate);
+    const inMonth = cellDate.getMonth() === calendarMonth;
+    const meta = getCalendarMeta(dateKey, cellDate);
+    const dayText = String(cellDate.getDate()).padStart(2, "0");
+    cells.push(`
+      <button class="calendar-day ${inMonth ? "" : "is-muted"} ${meta.className}" type="button" data-calendar-date="${dateKey}">
+        <strong>${dayText}</strong>
+        <span>${meta.note}</span>
+      </button>
+    `);
+  }
+
+  calendarGrid.innerHTML = cells.join("");
+  renderCalendarList();
+}
+
+function getCalendarListRows() {
+  const generatedWeekendRows = [];
+  if (calendarWeekendGenerated) {
+    const start = new Date(calendarYear, 0, 1);
+    const end = new Date(calendarYear, 11, 31);
+    for (const date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+      const dateKey = formatCalendarDate(date);
+      if ((date.getDay() === 0 || date.getDay() === 6) && !calendarEvents[dateKey]) {
+        generatedWeekendRows.push({
+          dateKey,
+          type: "holiday",
+          note: "例假日",
+        });
+      }
+    }
+  }
+
+  const customRows = Object.entries(calendarEvents)
+    .filter(([dateKey]) => dateKey.startsWith(`${calendarYear}-`))
+    .map(([dateKey, value]) => ({ dateKey, ...value }));
+
+  return [...customRows, ...generatedWeekendRows]
+    .sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+}
+
+function renderCalendarList() {
+  if (!calendarListRows) return;
+
+  const rows = getCalendarListRows();
+  calendarListRows.innerHTML = rows.map((row) => {
+    const date = new Date(`${row.dateKey}T00:00:00`);
+    const type = calendarTypeMeta[row.type] || calendarTypeMeta.workday;
+    return `
+      <tr>
+        <td>${row.dateKey}</td>
+        <td>${calendarWeekdays[date.getDay()]}</td>
+        <td><span class="calendar-badge ${type.className}">${type.label}</span></td>
+        <td>${escapeHtml(row.note)}</td>
+        <td><button type="button" data-calendar-edit="${row.dateKey}">編輯</button><button type="button" data-calendar-delete="${row.dateKey}">刪除</button></td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function openCalendarModal(dateKey = formatCalendarDate(new Date(calendarYear, calendarMonth, 1))) {
+  if (!calendarModal || !calendarDateInput || !calendarNoteInput || !calendarModalTitle) return;
+
+  const event = calendarEvents[dateKey];
+  const date = new Date(`${dateKey}T00:00:00`);
+  const fallback = getCalendarMeta(dateKey, date);
+  editingCalendarDate = dateKey;
+  calendarModalTitle.textContent = `設定日期：${dateKey}`;
+  calendarDateInput.value = dateKey;
+  calendarNoteInput.value = event?.note || fallback.note;
+  const typeValue = event?.type || fallback.type;
+  const typeRadio = calendarModal.querySelector(`[name="calendarType"][value="${typeValue}"]`);
+  if (typeRadio) typeRadio.checked = true;
+  calendarModal.classList.add("is-visible");
+  calendarModal.setAttribute("aria-hidden", "false");
+}
+
+function closeCalendarModal() {
+  if (!calendarModal) return;
+  calendarModal.classList.remove("is-visible");
+  calendarModal.setAttribute("aria-hidden", "true");
+}
+
+function showCalendarSuccess(message) {
+  let toast = document.querySelector("#calendarToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "calendarToast";
+    toast.className = "calendar-toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.innerHTML = `<strong>萬年曆</strong><span>${message}</span>`;
+  toast.classList.add("is-visible");
+  window.clearTimeout(showCalendarSuccess.timer);
+  showCalendarSuccess.timer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 2200);
+}
+
+function exportCalendarCsv() {
+  const rows = getCalendarListRows().map((row) => {
+    const date = new Date(`${row.dateKey}T00:00:00`);
+    const type = calendarTypeMeta[row.type] || calendarTypeMeta.workday;
+    return [row.dateKey, calendarWeekdays[date.getDay()], type.label, row.note]
+      .map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",");
+  });
+  const csv = ["日期,星期,假日類型,說明備註", ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `calendar-${calendarYear}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 function exportCsv() {
   const visibleRows = [...alarmRows.querySelectorAll("tr")].map((tr) => {
     return [...tr.querySelectorAll("td")].slice(0, 5).map((td) => `"${td.textContent.trim()}"`).join(",");
@@ -313,6 +596,74 @@ function setRoomReading(roomId) {
   document.querySelectorAll("[data-room]").forEach((button) => {
     button.classList.toggle("is-selected", button.dataset.room === String(roomId));
   });
+}
+
+function getCurrentClockText() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+
+function getNextSecurityCameraPosition() {
+  let nextIndex = Math.floor(Math.random() * securityCameraPositions.length);
+  if (nextIndex === currentSecurityCameraPositionIndex) {
+    nextIndex = (nextIndex + 1) % securityCameraPositions.length;
+  }
+  currentSecurityCameraPositionIndex = nextIndex;
+  return securityCameraPositions[nextIndex];
+}
+
+function triggerRandomSecurityAlert() {
+  if (!securityCameraAlert) return;
+
+  let nextIndex = Math.floor(Math.random() * securityAlerts.length);
+  if (nextIndex === currentSecurityAlertIndex) {
+    nextIndex = (nextIndex + 1) % securityAlerts.length;
+  }
+  currentSecurityAlertIndex = nextIndex;
+
+  const alert = securityAlerts[nextIndex];
+  const time = getCurrentClockText();
+  const cameraPosition = getNextSecurityCameraPosition();
+
+  window.clearTimeout(securityAlertAnimationTimer);
+  const hadActiveAlert = securityCameraAlert.classList.contains("is-active");
+  securityCameraAlert.classList.remove("is-active");
+  securityCameraAlert.classList.toggle("is-collapsing", hadActiveAlert);
+  securityMapMarker?.classList.remove("is-active");
+
+  const showNextAlert = () => {
+    securityAlarmType.textContent = alert.type;
+    securityAlarmLocation.textContent = alert.location;
+    securityAlarmMessage.textContent = alert.message;
+    securityAlarmTime.textContent = time;
+    securityCameraChannel.textContent = alert.channel;
+    securityAlertSummary.textContent = `警戒　${time} ${alert.type}　${alert.location}`;
+    securityCameraAlert.style.left = `${cameraPosition.x}%`;
+    securityCameraAlert.style.top = `${cameraPosition.y}%`;
+    if (securityMapMarker && alert.marker) {
+      securityMapMarker.style.left = `${alert.marker.x}%`;
+      securityMapMarker.style.top = `${alert.marker.y}%`;
+      securityMapMarkerLabel.textContent = alert.location;
+    }
+
+    document.querySelectorAll(".security-status span").forEach((item) => {
+      item.classList.toggle("is-alert", item.id === alert.statusId);
+    });
+    securityAlertSummary.classList.add("is-alert");
+    securityCameraAlert.classList.remove("is-collapsing");
+    void securityCameraAlert.offsetWidth;
+    securityCameraAlert.classList.add("is-active");
+    securityMapMarker?.classList.add("is-active");
+  };
+
+  securityAlertAnimationTimer = window.setTimeout(showNextAlert, hadActiveAlert ? 260 : 0);
+}
+
+function startSecurityAlertSimulation() {
+  if (securityAlertTimer) return;
+
+  window.setTimeout(triggerRandomSecurityAlert, 900);
+  securityAlertTimer = window.setInterval(triggerRandomSecurityAlert, 10000);
 }
 
 function renderSelectedAccess() {
@@ -492,6 +843,83 @@ document.addEventListener("click", (event) => {
     closeSensorEditModal();
   }
 
+  if (event.target.closest("#calendarManualBtn")) {
+    openCalendarModal(formatCalendarDate(new Date(calendarYear, calendarMonth, 1)));
+  }
+
+  if (event.target.closest("#calendarBatchBtn")) {
+    calendarWeekendGenerated = true;
+    renderCalendar();
+    const weekendCount = getCalendarListRows().filter((row) => {
+      const date = new Date(`${row.dateKey}T00:00:00`);
+      return (date.getDay() === 0 || date.getDay() === 6) && row.note === "例假日";
+    }).length;
+    const batchButton = document.querySelector("#calendarBatchBtn");
+    if (batchButton) batchButton.textContent = `已產生 ${calendarYear} 全年週末例假日`;
+    showCalendarSuccess(`批次產生成功，共 ${weekendCount} 筆週末例假日`);
+  }
+
+  if (event.target.closest("#calendarExportBtn")) {
+    exportCalendarCsv();
+  }
+
+  if (event.target.closest("[data-calendar-prev]")) {
+    calendarMonth -= 1;
+    if (calendarMonth < 0) {
+      calendarMonth = 11;
+      calendarYear -= 1;
+    }
+    renderCalendar();
+  }
+
+  if (event.target.closest("[data-calendar-next]")) {
+    calendarMonth += 1;
+    if (calendarMonth > 11) {
+      calendarMonth = 0;
+      calendarYear += 1;
+    }
+    renderCalendar();
+  }
+
+  if (event.target.closest("[data-calendar-today]")) {
+    const today = new Date();
+    calendarYear = today.getFullYear();
+    calendarMonth = today.getMonth();
+    renderCalendar();
+  }
+
+  const calendarTab = event.target.closest("[data-calendar-tab]");
+  if (calendarTab) {
+    const tabName = calendarTab.dataset.calendarTab;
+    document.querySelectorAll("[data-calendar-tab]").forEach((button) => {
+      button.classList.toggle("is-active", button === calendarTab);
+    });
+    document.querySelectorAll("[data-calendar-panel]").forEach((panel) => {
+      panel.classList.toggle("is-active", panel.dataset.calendarPanel === tabName);
+    });
+    renderCalendarList();
+  }
+
+  const calendarEdit = event.target.closest("[data-calendar-edit]");
+  if (calendarEdit) {
+    openCalendarModal(calendarEdit.dataset.calendarEdit);
+  }
+
+  const calendarDelete = event.target.closest("[data-calendar-delete]");
+  if (calendarDelete) {
+    delete calendarEvents[calendarDelete.dataset.calendarDelete];
+    renderCalendar();
+  }
+
+  const calendarDay = event.target.closest("[data-calendar-date]");
+  if (calendarDay) {
+    openCalendarModal(calendarDay.dataset.calendarDate);
+  }
+
+  if (event.target === calendarModal || event.target.closest(".calendar-modal-close") || event.target.closest("[data-calendar-cancel]")) {
+    closeCalendarModal();
+  }
+
   if (event.target.closest("[data-access-submit]")) {
     showAccessSuccess("設定成功");
   }
@@ -501,6 +929,31 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && sensorEditModal?.classList.contains("is-visible")) {
     closeSensorEditModal();
   }
+  if (event.key === "Escape" && calendarModal?.classList.contains("is-visible")) {
+    closeCalendarModal();
+  }
+});
+
+calendarYearInput?.addEventListener("change", () => {
+  calendarYear = Number(calendarYearInput.value) || 2026;
+  renderCalendar();
+});
+
+calendarModal?.querySelector("form")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!calendarDateInput || !calendarNoteInput || !calendarModal) return;
+
+  const dateKey = calendarDateInput.value || editingCalendarDate;
+  const checkedType = calendarModal.querySelector("[name='calendarType']:checked");
+  calendarEvents[dateKey] = {
+    type: checkedType?.value || "holiday",
+    note: calendarNoteInput.value.trim() || calendarTypeMeta[checkedType?.value || "holiday"].label,
+  };
+  const date = new Date(`${dateKey}T00:00:00`);
+  calendarYear = date.getFullYear();
+  calendarMonth = date.getMonth();
+  closeCalendarModal();
+  renderCalendar();
 });
 
 sensorEditModal?.querySelector("form")?.addEventListener("submit", (event) => {
@@ -547,4 +1000,5 @@ if (exportBtn) {
 
 renderAlarms();
 renderSelectedAccess();
+renderCalendar();
 renderSensors();

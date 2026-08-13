@@ -49,6 +49,10 @@
             <span class="nav-icon access-icon"></span>
             <span><strong>Access</strong><small>門禁管理</small></span>
           </button>
+          <button class="nav-item" type="button" data-view="calendar">
+            <span class="nav-icon calendar-icon"></span>
+            <span><strong>Calendar</strong><small>萬年曆</small></span>
+          </button>
           <button class="nav-item" type="button" data-view="sensor">
             <span class="nav-icon sensor-icon"></span>
             <span><strong>Sensor</strong><small>感測器管理</small></span>
@@ -192,11 +196,28 @@
         <section id="securityView" class="view security-page" aria-label="安防圖控">
           <h2>4F 展館3-2</h2>
           <div class="security-layout">
-            <img class="security-monitor-image" src="assets/security-monitor.png" alt="4F 展館監控儀表板" />
+            <img class="security-monitor-image" src="assets/security-monitor-clean.png" alt="4F 展館監控儀表板" />
+            <div id="securityMapMarker" class="security-map-marker" aria-hidden="true">
+              <span></span>
+              <strong id="securityMapMarkerLabel">4F 第三展廳</strong>
+            </div>
+            <aside id="securityCameraAlert" class="security-camera-alert" aria-live="polite">
+              <div class="security-camera-feed">
+                <img src="assets/cctv-preview.png" alt="警報監控截圖" />
+                <i></i>
+                <span id="securityCameraChannel">CH 1</span>
+              </div>
+              <div class="security-camera-copy">
+                <span id="securityAlarmType">磁簧開啟</span>
+                <strong id="securityAlarmLocation">4F 第三展廳</strong>
+                <p id="securityAlarmMessage">展示櫃門位異常開啟，請前往查看。</p>
+                <time id="securityAlarmTime">07:34</time>
+              </div>
+            </aside>
           </div>
           <div class="security-status">
-            <span>淹水警報 ≋</span><span>煙霧偵測 ▲</span><span>磁簧開啟 ● D-12　21:32</span><span>玻璃破碎 ▧</span>
-            <strong>警戒　07:34 展示櫃開啟　02:10 電子圍籬跨越</strong>
+            <span id="securityFloodStatus">淹水警報 ≋</span><span id="securitySmokeStatus">煙霧偵測 ▲</span><span id="securityDoorStatus">磁簧開啟 ● D-12　21:32</span><span id="securityGlassStatus">玻璃破碎 ▧</span>
+            <strong id="securityAlertSummary">警戒　07:34 展示櫃開啟　02:10 電子圍籬跨越</strong>
           </div>
         </section>
 
@@ -335,6 +356,49 @@
           </div>
         </section>
 
+        <section id="calendarView" class="view calendar-page" aria-label="萬年曆">
+          <div class="calendar-tabs" aria-label="萬年曆分頁">
+            <button type="button" data-home>首頁</button>
+            <button class="is-active" type="button">萬年曆 <span>×</span></button>
+          </div>
+
+          <div class="calendar-toolbar">
+            <label>檢視年份 <input id="calendarYear" type="number" min="2000" max="2099" value="2026" /></label>
+            <button class="calendar-action is-primary" id="calendarManualBtn" type="button">＋ 手動新增假期（可跨年月日）</button>
+            <button class="calendar-action is-warning" id="calendarBatchBtn" type="button">批次產生 2026 全年週末例假日</button>
+            <button class="calendar-action is-success" id="calendarExportBtn" type="button">匯出門禁卡機假日表（CSV）</button>
+          </div>
+
+          <div class="calendar-content">
+            <div class="calendar-view-tabs">
+              <button class="is-active" type="button" data-calendar-tab="month">萬年曆檢視</button>
+              <button type="button" data-calendar-tab="list">全期間特殊日期清單（門禁卡機設控總表）</button>
+            </div>
+
+            <section class="calendar-month-panel is-active" data-calendar-panel="month">
+              <div class="calendar-month-head">
+                <h2 id="calendarMonthTitle">2026 January</h2>
+                <div>
+                  <button type="button" data-calendar-prev>Previous Month</button>
+                  <button type="button" data-calendar-today>Today</button>
+                  <button type="button" data-calendar-next>Next Month</button>
+                </div>
+              </div>
+              <div class="calendar-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+              <div id="calendarGrid" class="calendar-grid" aria-label="月曆日期"></div>
+            </section>
+
+            <section class="calendar-list-panel" data-calendar-panel="list">
+              <table class="calendar-list-table">
+                <thead>
+                  <tr><th>日期 (YYYY-MM-DD)</th><th>星期</th><th>假日類型</th><th>說明 / 備註</th><th>操作</th></tr>
+                </thead>
+                <tbody id="calendarListRows"></tbody>
+              </table>
+            </section>
+          </div>
+        </section>
+
         <section id="sensorView" class="view sensor-page" aria-label="感測器管理">
           <div class="sensor-type-tabs" aria-label="感測器類型">
             <button class="is-active" type="button">煙霧偵測</button>
@@ -404,6 +468,32 @@
         </section>
       </section>
     </main>
+
+    <div id="calendarModal" class="calendar-modal" aria-hidden="true">
+      <form class="calendar-modal-panel" aria-label="設定萬年曆日期">
+        <button class="calendar-modal-close" type="button" aria-label="關閉萬年曆設定視窗">×</button>
+        <h2 id="calendarModalTitle">設定日期：2026-01-01</h2>
+        <label>
+          <span>選擇日期</span>
+          <input id="calendarDateInput" type="date" value="2026-01-01" />
+        </label>
+        <fieldset>
+          <legend>日期類型</legend>
+          <label><input type="radio" name="calendarType" value="workday" /> 一般工作日</label>
+          <label><input type="radio" name="calendarType" value="holiday" checked /> 國定/例假日</label>
+          <label><input type="radio" name="calendarType" value="flex" /> 彈性放假</label>
+          <label><input type="radio" name="calendarType" value="makeup" /> 補班日</label>
+        </fieldset>
+        <label>
+          <span>名稱/備註</span>
+          <input id="calendarNoteInput" value="元旦" />
+        </label>
+        <div class="calendar-modal-actions">
+          <button type="button" data-calendar-cancel>取消</button>
+          <button type="submit">確認儲存</button>
+        </div>
+      </form>
+    </div>
 
     <div id="sensorEditModal" class="sensor-modal" aria-hidden="true">
       <form class="sensor-modal-panel" aria-label="修改感測器資料">
