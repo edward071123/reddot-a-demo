@@ -18,6 +18,20 @@ const alarmData = [
   ["跨區警戒", "2F 第一展廳", "跨區安防觸發", "2025.09.07 08:07", "已處理"],
 ];
 
+const alarmSettingPhones = Array.from({ length: 16 }, (_, index) => (
+  index === 1 ? "0921221545" : ""
+));
+
+const alarmSettingMessages = [
+  "測試簡訊1",
+  "測試簡訊123",
+  "3",
+  "4",
+  "5",
+  "6",
+  "", "", "", "", "", "", "", "", "", "",
+];
+
 const roomReadings = {
   1: { temp: "26.8", humidity: "58.4" },
   2: { temp: "27.1", humidity: "59.2" },
@@ -239,6 +253,9 @@ const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
 const alarmRows = document.querySelector("#alarmRows");
 const alarmType = document.querySelector("#alarmType");
+const alarmSettingModal = document.querySelector("#alarmSettingModal");
+const alarmPhoneFields = document.querySelector("#alarmPhoneFields");
+const alarmMessageFields = document.querySelector("#alarmMessageFields");
 const breadcrumbs = document.querySelector("#breadcrumbs");
 const tempValue = document.querySelector("#tempValue");
 const humidityValue = document.querySelector("#humidityValue");
@@ -324,6 +341,55 @@ function renderAlarms(filter = "") {
     const cells = row.map((cell) => `<td>${cell}</td>`).join("");
     return `<tr>${cells}<td><span class="mail-cell" aria-label="已發送"></span></td></tr>`;
   }).join("");
+}
+
+function renderAlarmSettingFields() {
+  if (alarmPhoneFields) {
+    alarmPhoneFields.innerHTML = alarmSettingPhones.map((value, index) => `
+      <label class="alarm-setting-row">
+        <span>Phone-${index + 1}</span>
+        <input name="phone${index + 1}" value="${escapeHtml(value)}" inputmode="tel" />
+      </label>
+    `).join("");
+  }
+
+  if (alarmMessageFields) {
+    alarmMessageFields.innerHTML = alarmSettingMessages.map((value, index) => `
+      <label class="alarm-setting-row">
+        <span>第${index + 1}組</span>
+        <input name="message${index + 1}" value="${escapeHtml(value)}" />
+      </label>
+    `).join("");
+  }
+}
+
+function openAlarmSettingModal() {
+  renderAlarmSettingFields();
+  alarmSettingModal?.classList.add("is-visible");
+  alarmSettingModal?.setAttribute("aria-hidden", "false");
+  alarmSettingModal?.querySelector("input")?.focus();
+}
+
+function closeAlarmSettingModal() {
+  alarmSettingModal?.classList.remove("is-visible");
+  alarmSettingModal?.setAttribute("aria-hidden", "true");
+}
+
+function showAlarmSettingSuccess(message = "警報設定已儲存") {
+  let toast = document.querySelector("#alarmSettingToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "alarmSettingToast";
+    toast.className = "alarm-setting-toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.innerHTML = `<strong>警報設定</strong><span>${message}</span>`;
+  toast.classList.add("is-visible");
+  window.clearTimeout(showAlarmSettingSuccess.timer);
+  showAlarmSettingSuccess.timer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 2200);
 }
 
 function renderSensors(type = currentSensorType) {
@@ -843,6 +909,31 @@ document.addEventListener("click", (event) => {
     closeSensorEditModal();
   }
 
+  if (event.target.closest("#alarmSettingBtn")) {
+    openAlarmSettingModal();
+  }
+
+  if (event.target === alarmSettingModal || event.target.closest(".alarm-setting-close")) {
+    closeAlarmSettingModal();
+  }
+
+  if (event.target.closest("[data-alarm-upload]")) {
+    showAlarmSettingSuccess("上傳資料成功");
+  }
+
+  if (event.target.closest("[data-alarm-read]")) {
+    renderAlarmSettingFields();
+    showAlarmSettingSuccess("讀取資料成功");
+  }
+
+  if (event.target.closest("[data-alarm-log]")) {
+    showAlarmSettingSuccess("已開啟模擬紀錄");
+  }
+
+  if (event.target.closest("[data-alarm-network]")) {
+    showAlarmSettingSuccess("網路設定成功");
+  }
+
   if (event.target.closest("#calendarManualBtn")) {
     openCalendarModal(formatCalendarDate(new Date(calendarYear, calendarMonth, 1)));
   }
@@ -932,6 +1023,22 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && calendarModal?.classList.contains("is-visible")) {
     closeCalendarModal();
   }
+  if (event.key === "Escape" && alarmSettingModal?.classList.contains("is-visible")) {
+    closeAlarmSettingModal();
+  }
+});
+
+alarmSettingModal?.querySelector("form")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  alarmSettingModal.querySelectorAll("[name^='phone']").forEach((input, index) => {
+    alarmSettingPhones[index] = input.value.trim();
+  });
+  alarmSettingModal.querySelectorAll("[name^='message']").forEach((input, index) => {
+    alarmSettingMessages[index] = input.value.trim();
+  });
+  closeAlarmSettingModal();
+  showAlarmSettingSuccess("簡訊警報設定已儲存");
 });
 
 calendarYearInput?.addEventListener("change", () => {

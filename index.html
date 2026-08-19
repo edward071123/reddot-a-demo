@@ -185,6 +185,7 @@
                 <option>08:23</option>
               </select>
             </label>
+            <button id="alarmSettingBtn" class="alarm-setting-open" type="button">警報設定</button>
           </div>
           <table class="alarm-table">
             <thead><tr><th>警報點</th><th>位置</th><th>告警訊息</th><th>發生時間</th><th>處理狀態</th><th>發送紀錄</th></tr></thead>
@@ -492,6 +493,52 @@
           <button type="button" data-calendar-cancel>取消</button>
           <button type="submit">確認儲存</button>
         </div>
+      </form>
+    </div>
+
+    <div id="alarmSettingModal" class="alarm-setting-modal" aria-hidden="true">
+      <form class="alarm-setting-panel" aria-label="警報簡訊設定">
+        <header class="alarm-setting-head">
+          <div>
+            <span>Alarm Message</span>
+            <h2>簡訊-訊息編輯</h2>
+          </div>
+          <button class="alarm-setting-close" type="button" aria-label="關閉警報設定">×</button>
+        </header>
+
+        <section class="alarm-setting-options">
+          <label class="alarm-radio"><input type="radio" name="alarmSendMode" checked /> 傳送簡訊</label>
+          <div class="alarm-checks">
+            <label><input type="checkbox" /> 傳送警報解除</label>
+            <label><input type="checkbox" checked /> 傳送警報持續</label>
+          </div>
+        </section>
+
+        <div class="alarm-setting-grid">
+          <section class="alarm-setting-card">
+            <div class="alarm-setting-card-title">
+              <h3>手機號碼輸入</h3>
+              <p>最多 16 組接收人，可直接修改。</p>
+            </div>
+            <div id="alarmPhoneFields" class="alarm-field-list"></div>
+          </section>
+
+          <section class="alarm-setting-card">
+            <div class="alarm-setting-card-title">
+              <h3>簡訊內容輸入</h3>
+              <p>每組訊息可設定不同警報文字。</p>
+            </div>
+            <div id="alarmMessageFields" class="alarm-field-list"></div>
+          </section>
+        </div>
+
+        <footer class="alarm-setting-actions">
+          <button type="button" data-alarm-upload>上傳資料</button>
+          <button type="button" data-alarm-read>讀取資料</button>
+          <button type="button" data-alarm-log>查看紀錄</button>
+          <button type="button" data-alarm-network>設定網路</button>
+          <button class="is-save" type="submit">儲存設定</button>
+        </footer>
       </form>
     </div>
 
