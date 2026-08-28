@@ -77,6 +77,7 @@
           <nav id="breadcrumbs" class="breadcrumbs" aria-label="目前位置">
             <button type="button" data-home>首頁</button><span> / IOT 物聯網數據平台</span>
           </nav>
+          <button id="logoutBtn" class="logout-btn" type="button">登出</button>
           <strong>Reddot Smart Building System</strong>
         </header>
 
@@ -228,13 +229,17 @@
               <h2>權限密碼管理</h2>
               <p>所有管理人員帳號、密碼與系統權限總覽</p>
             </div>
-            <button type="button">新增管理人員</button>
+            <div class="account-heading-actions">
+              <button type="button" data-account-all>所有管理人員</button>
+              <button type="button" data-account-add>新增</button>
+            </div>
           </div>
           <div class="account-tools">
-            <label>搜尋 <input value="全部管理人員" /></label>
-            <label>角色 <select><option>全部角色</option><option>系統管理員</option><option>策展管理</option><option>維運人員</option><option>安防人員</option></select></label>
-            <label>狀態 <select><option>全部狀態</option><option>啟用</option><option>停用</option></select></label>
-            <span>共 6 位管理人員</span>
+            <label>管理人員 <input id="accountSearchInput" placeholder="請輸入管理人員名稱或帳號" /></label>
+            <label>角色 <select id="accountRoleFilter"><option>全部角色</option><option>系統管理員</option><option>策展管理</option><option>維運人員</option><option>安防人員</option><option>警報處理</option><option>資料檢視</option><option>後台管理者</option><option>最高管理者</option></select></label>
+            <label>狀態 <select id="accountStatusFilter"><option>全部狀態</option><option>啟用</option><option>停用</option></select></label>
+            <button type="button" data-account-search>搜尋</button>
+            <span id="accountCount">共 6 位管理人員</span>
           </div>
           <div class="account-table-card">
             <table class="account-table">
@@ -250,14 +255,7 @@
                   <th>操作</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr><td>王志明</td><td>admin</td><td>123123</td><td>系統管理員</td><td>全館 / 帳密 / 警報 / 感測器</td><td><span class="status-on">啟用</span></td><td>2026.07.20 08:30</td><td><button>編輯</button><button>重設</button></td></tr>
-                <tr><td>林佳蓉</td><td>curator</td><td>curator2026</td><td>策展管理</td><td>展廳資訊 / 人流分析</td><td><span class="status-on">啟用</span></td><td>2026.07.19 17:12</td><td><button>編輯</button><button>重設</button></td></tr>
-                <tr><td>陳建宏</td><td>operator</td><td>op2026</td><td>維運人員</td><td>設備點位 / 溫濕度 / 感測器</td><td><span class="status-on">啟用</span></td><td>2026.07.19 09:45</td><td><button>編輯</button><button>重設</button></td></tr>
-                <tr><td>張雅婷</td><td>security</td><td>sec2026</td><td>安防人員</td><td>安防圖控 / 警戒事件</td><td><span class="status-on">啟用</span></td><td>2026.07.18 22:05</td><td><button>編輯</button><button>重設</button></td></tr>
-                <tr><td>許文凱</td><td>alarm</td><td>alarm2026</td><td>警報處理</td><td>警報歷程 / 發送紀錄</td><td><span class="status-on">啟用</span></td><td>2026.07.18 13:28</td><td><button>編輯</button><button>重設</button></td></tr>
-                <tr><td>黃郁庭</td><td>viewer</td><td>view2026</td><td>資料檢視</td><td>儀表板唯讀</td><td><span class="status-off">停用</span></td><td>2026.07.10 11:02</td><td><button>編輯</button><button>啟用</button></td></tr>
-              </tbody>
+              <tbody id="accountRows"></tbody>
             </table>
           </div>
         </section>
@@ -579,6 +577,47 @@
           <textarea id="sensorEditNote" name="note"></textarea>
         </label>
         <button type="submit">修 改 完 成</button>
+      </form>
+    </div>
+
+    <div id="accountModal" class="account-modal" aria-hidden="true">
+      <form class="account-modal-panel" aria-label="新增管理者">
+        <button class="account-modal-close" type="button" aria-label="關閉管理者視窗">×</button>
+        <h2 id="accountModalTitle">新增管理者</h2>
+        <label>
+          <span>名稱:</span>
+          <input id="accountNameInput" name="name" placeholder="名稱" required />
+        </label>
+        <label>
+          <span>帳號:</span>
+          <input id="accountUsernameInput" name="username" placeholder="帳號" required />
+        </label>
+        <label>
+          <span>密碼:</span>
+          <input id="accountPasswordInput" name="password" type="password" placeholder="密碼" required />
+        </label>
+        <label>
+          <span>確認密碼:</span>
+          <input id="accountConfirmPasswordInput" name="confirmPassword" type="password" placeholder="確認密碼" required />
+        </label>
+        <label>
+          <span>角色:</span>
+          <select id="accountRoleInput" name="role">
+            <option>後台管理者</option>
+            <option>最高管理者</option>
+            <option>系統管理員</option>
+            <option>策展管理</option>
+            <option>維運人員</option>
+            <option>安防人員</option>
+            <option>警報處理</option>
+            <option>資料檢視</option>
+          </select>
+        </label>
+        <p id="accountModalError" class="account-modal-error" role="alert"></p>
+        <div class="account-modal-actions">
+          <button type="button" data-account-cancel>關閉視窗</button>
+          <button type="submit">確定新增</button>
+        </div>
       </form>
     </div>
 

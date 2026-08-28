@@ -123,6 +123,15 @@ const securityCameraPositions = [
   { x: 58, y: 47 },
 ];
 
+const accountAdmins = [
+  { name: "王志明", username: "admin", password: "123123", role: "系統管理員", scope: "全館 / 帳密 / 警報 / 感測器", status: "啟用", lastLogin: "2026.07.20 08:30" },
+  { name: "林佳蓉", username: "curator", password: "curator2026", role: "策展管理", scope: "展廳資訊 / 人流分析", status: "啟用", lastLogin: "2026.07.19 17:12" },
+  { name: "陳建宏", username: "operator", password: "op2026", role: "維運人員", scope: "設備點位 / 溫濕度 / 感測器", status: "啟用", lastLogin: "2026.07.19 09:45" },
+  { name: "張雅婷", username: "security", password: "sec2026", role: "安防人員", scope: "安防圖控 / 警戒事件", status: "啟用", lastLogin: "2026.07.18 22:05" },
+  { name: "許文凱", username: "alarm", password: "alarm2026", role: "警報處理", scope: "警報歷程 / 發送紀錄", status: "啟用", lastLogin: "2026.07.18 13:28" },
+  { name: "黃郁庭", username: "viewer", password: "view2026", role: "資料檢視", scope: "儀表板唯讀", status: "停用", lastLogin: "2026.07.10 11:02" },
+];
+
 let calendarYear = 2026;
 let calendarMonth = 0;
 let calendarWeekendGenerated = false;
@@ -131,6 +140,7 @@ let securityAlertTimer = null;
 let securityAlertAnimationTimer = null;
 let currentSecurityAlertIndex = -1;
 let currentSecurityCameraPositionIndex = -1;
+let editingAccountIndex = null;
 
 const sensorDataByType = {
   "煙霧偵測": [
@@ -251,6 +261,7 @@ const loginScreen = document.querySelector("#loginScreen");
 const appShell = document.querySelector("#appShell");
 const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
+const logoutBtn = document.querySelector("#logoutBtn");
 const alarmRows = document.querySelector("#alarmRows");
 const alarmType = document.querySelector("#alarmType");
 const alarmSettingModal = document.querySelector("#alarmSettingModal");
@@ -293,6 +304,19 @@ const calendarModal = document.querySelector("#calendarModal");
 const calendarModalTitle = document.querySelector("#calendarModalTitle");
 const calendarDateInput = document.querySelector("#calendarDateInput");
 const calendarNoteInput = document.querySelector("#calendarNoteInput");
+const accountRows = document.querySelector("#accountRows");
+const accountCount = document.querySelector("#accountCount");
+const accountSearchInput = document.querySelector("#accountSearchInput");
+const accountRoleFilter = document.querySelector("#accountRoleFilter");
+const accountStatusFilter = document.querySelector("#accountStatusFilter");
+const accountModal = document.querySelector("#accountModal");
+const accountModalTitle = document.querySelector("#accountModalTitle");
+const accountNameInput = document.querySelector("#accountNameInput");
+const accountUsernameInput = document.querySelector("#accountUsernameInput");
+const accountPasswordInput = document.querySelector("#accountPasswordInput");
+const accountConfirmPasswordInput = document.querySelector("#accountConfirmPasswordInput");
+const accountRoleInput = document.querySelector("#accountRoleInput");
+const accountModalError = document.querySelector("#accountModalError");
 let accessStep = 1;
 let editingSensorRow = null;
 let currentSensorType = "煙霧偵測";
@@ -318,7 +342,20 @@ function setLoggedIn() {
   loginScreen.classList.add("is-hidden");
   appShell.classList.remove("is-hidden");
   showView("dashboard");
+  renderAccounts();
   startSecurityAlertSimulation();
+}
+
+function setLoggedOut() {
+  window.clearInterval(securityAlertTimer);
+  window.clearTimeout(securityAlertAnimationTimer);
+  securityAlertTimer = null;
+  securityAlertAnimationTimer = null;
+  loginScreen.classList.remove("is-hidden");
+  appShell.classList.add("is-hidden");
+  loginError.textContent = "";
+  loginForm.reset();
+  document.querySelector("#username").value = credentials.username;
 }
 
 function showView(name) {
@@ -388,6 +425,107 @@ function showAlarmSettingSuccess(message = "警報設定已儲存") {
   toast.classList.add("is-visible");
   window.clearTimeout(showAlarmSettingSuccess.timer);
   showAlarmSettingSuccess.timer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 2200);
+}
+
+function getAccountScope(role) {
+  return {
+    後台管理者: "後台管理 / 門禁 / 感測器",
+    最高管理者: "全館 / 帳密 / 警報 / 感測器",
+    系統管理員: "全館 / 帳密 / 警報 / 感測器",
+    策展管理: "展廳資訊 / 人流分析",
+    維運人員: "設備點位 / 溫濕度 / 感測器",
+    安防人員: "安防圖控 / 警戒事件",
+    警報處理: "警報歷程 / 發送紀錄",
+    資料檢視: "儀表板唯讀",
+  }[role] || "後台管理";
+}
+
+function getFilteredAccounts() {
+  const keyword = accountSearchInput?.value.trim().toLowerCase() || "";
+  const role = accountRoleFilter?.value || "全部角色";
+  const status = accountStatusFilter?.value || "全部狀態";
+
+  return accountAdmins
+    .map((admin, index) => ({ ...admin, index }))
+    .filter((admin) => {
+      const matchesKeyword = !keyword
+        || admin.name.toLowerCase().includes(keyword)
+        || admin.username.toLowerCase().includes(keyword);
+      const matchesRole = role === "全部角色" || admin.role === role;
+      const matchesStatus = status === "全部狀態" || admin.status === status;
+      return matchesKeyword && matchesRole && matchesStatus;
+    });
+}
+
+function renderAccounts() {
+  if (!accountRows) return;
+
+  const rows = getFilteredAccounts();
+  accountRows.innerHTML = rows.map((admin) => `
+    <tr>
+      <td>${escapeHtml(admin.name)}</td>
+      <td>${escapeHtml(admin.username)}</td>
+      <td>${escapeHtml(admin.password)}</td>
+      <td>${escapeHtml(admin.role)}</td>
+      <td>${escapeHtml(admin.scope)}</td>
+      <td><span class="${admin.status === "啟用" ? "status-on" : "status-off"}">${escapeHtml(admin.status)}</span></td>
+      <td>${escapeHtml(admin.lastLogin)}</td>
+      <td>
+        <button type="button" data-account-edit="${admin.index}">修改</button>
+        <button type="button" data-account-reset="${admin.index}">忘記密碼</button>
+        <button type="button" data-account-delete="${admin.index}">刪除</button>
+      </td>
+    </tr>
+  `).join("");
+
+  if (!rows.length) {
+    accountRows.innerHTML = `<tr><td colspan="8">查無管理人員</td></tr>`;
+  }
+  if (accountCount) accountCount.textContent = `共 ${rows.length} 位管理人員`;
+}
+
+function openAccountModal(index = null) {
+  if (!accountModal || !accountModalTitle) return;
+
+  editingAccountIndex = index;
+  const admin = Number.isInteger(index) ? accountAdmins[index] : null;
+  accountModalTitle.textContent = admin ? "修改管理者" : "新增管理者";
+  accountNameInput.value = admin?.name || "";
+  accountUsernameInput.value = admin?.username || "";
+  accountPasswordInput.value = admin?.password || "";
+  accountConfirmPasswordInput.value = admin?.password || "";
+  accountRoleInput.value = admin?.role || "後台管理者";
+  accountModalError.textContent = "";
+  accountModal.querySelector("form").setAttribute("aria-label", admin ? "修改管理者" : "新增管理者");
+  accountModal.querySelector("[type='submit']").textContent = admin ? "確定修改" : "確定新增";
+  accountModal.classList.add("is-visible");
+  accountModal.setAttribute("aria-hidden", "false");
+  accountNameInput.focus();
+}
+
+function closeAccountModal() {
+  if (!accountModal) return;
+
+  accountModal.classList.remove("is-visible");
+  accountModal.setAttribute("aria-hidden", "true");
+  editingAccountIndex = null;
+}
+
+function showAccountSuccess(message) {
+  let toast = document.querySelector("#accountToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "accountToast";
+    toast.className = "account-toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.innerHTML = `<strong>權限密碼管理</strong><span>${message}</span>`;
+  toast.classList.add("is-visible");
+  window.clearTimeout(showAccountSuccess.timer);
+  showAccountSuccess.timer = window.setTimeout(() => {
     toast.classList.remove("is-visible");
   }, 2200);
 }
@@ -843,6 +981,8 @@ document.querySelectorAll(".nav-item").forEach((button) => {
   button.addEventListener("click", () => showView(button.dataset.view));
 });
 
+logoutBtn?.addEventListener("click", setLoggedOut);
+
 document.addEventListener("click", (event) => {
   if (event.target.closest("[data-home]")) {
     showView("dashboard");
@@ -911,6 +1051,51 @@ document.addEventListener("click", (event) => {
 
   if (event.target.closest("#alarmSettingBtn")) {
     openAlarmSettingModal();
+  }
+
+  if (event.target.closest("[data-account-all]")) {
+    accountSearchInput.value = "";
+    accountRoleFilter.value = "全部角色";
+    accountStatusFilter.value = "全部狀態";
+    renderAccounts();
+  }
+
+  if (event.target.closest("[data-account-search]")) {
+    renderAccounts();
+  }
+
+  if (event.target.closest("[data-account-add]")) {
+    openAccountModal();
+  }
+
+  const accountEdit = event.target.closest("[data-account-edit]");
+  if (accountEdit) {
+    openAccountModal(Number(accountEdit.dataset.accountEdit));
+  }
+
+  const accountReset = event.target.closest("[data-account-reset]");
+  if (accountReset) {
+    const admin = accountAdmins[Number(accountReset.dataset.accountReset)];
+    if (admin) {
+      admin.password = "Temp@2026";
+      renderAccounts();
+      showAccountSuccess(`${admin.name} 密碼已重設為 Temp@2026`);
+    }
+  }
+
+  const accountDelete = event.target.closest("[data-account-delete]");
+  if (accountDelete) {
+    const index = Number(accountDelete.dataset.accountDelete);
+    const admin = accountAdmins[index];
+    if (admin && window.confirm(`確定刪除 ${admin.name}？`)) {
+      accountAdmins.splice(index, 1);
+      renderAccounts();
+      showAccountSuccess("管理人員已刪除");
+    }
+  }
+
+  if (event.target === accountModal || event.target.closest(".account-modal-close") || event.target.closest("[data-account-cancel]")) {
+    closeAccountModal();
   }
 
   if (event.target === alarmSettingModal || event.target.closest(".alarm-setting-close")) {
@@ -1026,6 +1211,9 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && alarmSettingModal?.classList.contains("is-visible")) {
     closeAlarmSettingModal();
   }
+  if (event.key === "Escape" && accountModal?.classList.contains("is-visible")) {
+    closeAccountModal();
+  }
 });
 
 alarmSettingModal?.querySelector("form")?.addEventListener("submit", (event) => {
@@ -1039,6 +1227,65 @@ alarmSettingModal?.querySelector("form")?.addEventListener("submit", (event) => 
   });
   closeAlarmSettingModal();
   showAlarmSettingSuccess("簡訊警報設定已儲存");
+});
+
+accountSearchInput?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    renderAccounts();
+  }
+});
+
+accountRoleFilter?.addEventListener("change", renderAccounts);
+accountStatusFilter?.addEventListener("change", renderAccounts);
+
+accountModal?.querySelector("form")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const name = accountNameInput.value.trim();
+  const username = accountUsernameInput.value.trim();
+  const password = accountPasswordInput.value;
+  const confirmPassword = accountConfirmPasswordInput.value;
+  const role = accountRoleInput.value;
+
+  if (password !== confirmPassword) {
+    accountModalError.textContent = "密碼與確認密碼不一致";
+    return;
+  }
+
+  const duplicate = accountAdmins.some((admin, index) => (
+    admin.username === username && index !== editingAccountIndex
+  ));
+  if (duplicate) {
+    accountModalError.textContent = "帳號已存在";
+    return;
+  }
+
+  const admin = {
+    name,
+    username,
+    password,
+    role,
+    scope: getAccountScope(role),
+    status: "啟用",
+    lastLogin: "尚未登入",
+  };
+
+  if (Number.isInteger(editingAccountIndex)) {
+    accountAdmins[editingAccountIndex] = {
+      ...accountAdmins[editingAccountIndex],
+      ...admin,
+      lastLogin: accountAdmins[editingAccountIndex].lastLogin,
+    };
+    showAccountSuccess("管理人員資料已修改");
+  } else {
+    accountAdmins.push(admin);
+    showAccountSuccess("管理人員已新增");
+  }
+
+  closeAccountModal();
+  showView("loginAdmin");
+  renderAccounts();
 });
 
 calendarYearInput?.addEventListener("change", () => {
@@ -1109,3 +1356,4 @@ renderAlarms();
 renderSelectedAccess();
 renderCalendar();
 renderSensors();
+renderAccounts();

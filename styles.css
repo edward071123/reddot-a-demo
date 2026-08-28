@@ -335,7 +335,7 @@ button { cursor: pointer; }
   height: 78px;
   padding: 0 20px 0 28px;
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr) auto;
+  grid-template-columns: 46px minmax(0, 1fr) auto auto;
   gap: 22px;
   align-items: center;
   background: white;
@@ -355,6 +355,17 @@ button { cursor: pointer; }
   font-weight: inherit;
 }
 .breadcrumbs button:hover { color: var(--cyan); }
+.logout-btn {
+  min-width: 74px;
+  height: 38px;
+  border: 0;
+  padding: 0 16px;
+  color: white;
+  background: #516071;
+  font-size: 15px;
+  font-weight: 900;
+}
+.logout-btn:hover { background: #2b918c; }
 .topbar strong { color: rgba(110,116,125,.12); font-size: clamp(28px, 3.2vw, 52px); white-space: nowrap; }
 
 .view { display: none; }
@@ -650,7 +661,7 @@ td:nth-child(3) { text-align: left; }
   .sidebar { position: static; height: auto; flex-direction: row; overflow-x: auto; }
   .main-nav { display: flex; }
   .sidebar-emblem, .topbar strong { display: none; }
-  .topbar { grid-template-columns: 34px minmax(0, 1fr); }
+  .topbar { grid-template-columns: 34px minmax(0, 1fr) auto; }
   #dashboardView, .alarm-view, .security-view, .placeholder-view { padding: 24px 16px; }
   .metric-grid, .dashboard-grid { grid-template-columns: 1fr; }
   .traffic-panel, .climate-panel { grid-column: auto; }
@@ -1565,7 +1576,8 @@ td:nth-child(3) { text-align: left; }
 }
 
 .access-toast,
-.calendar-toast {
+.calendar-toast,
+.account-toast {
   position: fixed;
   top: 26px;
   right: 28px;
@@ -1583,7 +1595,8 @@ td:nth-child(3) { text-align: left; }
 }
 
 .access-toast::before,
-.calendar-toast::before {
+.calendar-toast::before,
+.account-toast::before {
   content: "✓";
   position: absolute;
   left: 18px;
@@ -1599,7 +1612,8 @@ td:nth-child(3) { text-align: left; }
 }
 
 .access-toast.is-visible,
-.calendar-toast.is-visible {
+.calendar-toast.is-visible,
+.account-toast.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -1607,18 +1621,22 @@ td:nth-child(3) { text-align: left; }
 .access-toast strong,
 .access-toast span,
 .calendar-toast strong,
-.calendar-toast span {
+.calendar-toast span,
+.account-toast strong,
+.account-toast span {
   display: block;
 }
 
 .access-toast strong,
-.calendar-toast strong {
+.calendar-toast strong,
+.account-toast strong {
   font-size: 18px;
   font-weight: 900;
 }
 
 .access-toast span,
-.calendar-toast span {
+.calendar-toast span,
+.account-toast span {
   margin-top: 3px;
   color: #66717a;
   font-size: 15px;
@@ -2435,6 +2453,14 @@ td:nth-child(3) { text-align: left; }
   gap: 24px !important;
 }
 
+.account-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .account-heading h2,
 .sensor-heading h2 {
   margin: 0 !important;
@@ -2461,10 +2487,15 @@ td:nth-child(3) { text-align: left; }
   box-shadow: 0 10px 22px rgba(0,0,0,.22) !important;
 }
 
+.account-heading [data-account-add] {
+  background: #516071 !important;
+}
+
 .account-tools,
 .sensor-tools {
   display: flex !important;
   align-items: center !important;
+  flex-wrap: wrap !important;
   gap: 12px !important;
   padding: 14px !important;
   background: rgba(255,255,255,.06) !important;
@@ -2489,6 +2520,20 @@ td:nth-child(3) { text-align: left; }
   padding: 0 12px !important;
   color: #e7eef2 !important;
   background: #516071 !important;
+  font-weight: 900 !important;
+}
+
+.account-tools input {
+  width: 260px !important;
+}
+
+.account-tools button {
+  height: 34px !important;
+  border: 0 !important;
+  padding: 0 18px !important;
+  color: white !important;
+  background: #2b918c !important;
+  font-size: 15px !important;
   font-weight: 900 !important;
 }
 
@@ -2533,6 +2578,15 @@ td:nth-child(3) { text-align: left; }
   text-align: center !important;
 }
 
+#loginAdminView th:nth-child(1) { width: 11% !important; }
+#loginAdminView th:nth-child(2) { width: 11% !important; }
+#loginAdminView th:nth-child(3) { width: 12% !important; }
+#loginAdminView th:nth-child(4) { width: 12% !important; }
+#loginAdminView th:nth-child(5) { width: 19% !important; }
+#loginAdminView th:nth-child(6) { width: 8% !important; }
+#loginAdminView th:nth-child(7) { width: 14% !important; }
+#loginAdminView th:nth-child(8) { width: 13% !important; }
+
 #loginAdminView td,
 #sensorView td {
   padding: 11px 8px !important;
@@ -2571,6 +2625,20 @@ td:nth-child(3) { text-align: left; }
   background: #516071 !important;
   font-size: 13px !important;
   font-weight: 900 !important;
+}
+
+#loginAdminView td button {
+  margin: 2px !important;
+  padding: 6px 7px !important;
+  font-size: 12px !important;
+}
+
+#loginAdminView [data-account-reset] {
+  background: #66798b !important;
+}
+
+#loginAdminView [data-account-delete] {
+  background: #f36c61 !important;
 }
 
 .status-warn {
@@ -2896,6 +2964,125 @@ td:nth-child(3) { text-align: left; }
   transform: rotate(-8deg);
 }
 
+.account-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 82;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 34px;
+  background: rgba(248,249,250,.76);
+}
+
+.account-modal.is-visible {
+  display: flex;
+}
+
+.account-modal-panel {
+  position: relative;
+  width: min(860px, 88vw);
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 24px 18px;
+  padding: 34px 56px 40px;
+  border: 2px solid #74787d;
+  background: white;
+  box-shadow: 0 22px 58px rgba(42,48,54,.18);
+  color: #5b6570;
+}
+
+.account-modal-panel h2 {
+  grid-column: 1 / -1;
+  margin: 0 0 14px;
+  color: #4c535b;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.account-modal-close {
+  position: absolute;
+  right: 18px;
+  top: 16px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  color: #8b949d;
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.account-modal-panel label {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  color: #68727d;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.account-modal-panel label span {
+  text-align: right;
+}
+
+.account-modal-panel input,
+.account-modal-panel select {
+  min-width: 0;
+  width: 100%;
+  height: 38px;
+  border: 1px solid #dfe5ea;
+  border-radius: 4px;
+  padding: 0 14px;
+  color: #3d4650;
+  background: #fff;
+  outline: none;
+  font-weight: 800;
+}
+
+.account-modal-panel input:focus,
+.account-modal-panel select:focus {
+  border-color: #2b918c;
+  box-shadow: 0 0 0 2px rgba(43,145,140,.12);
+}
+
+.account-modal-error {
+  grid-column: 2;
+  min-height: 20px;
+  margin: -6px 0;
+  color: #f04d5d;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.account-modal-actions {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.account-modal-actions button {
+  min-width: 104px;
+  height: 38px;
+  border: 1px solid #e1e6eb;
+  border-radius: 4px;
+  padding: 0 18px;
+  color: #77828c;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.account-modal-actions button[type="submit"] {
+  border-color: #ff4d57;
+  color: white;
+  background: #ff4d57;
+}
+
 .sensor-modal {
   position: fixed;
   inset: 0;
@@ -3131,5 +3318,34 @@ td:nth-child(3) { text-align: left; }
   .sensor-modal-panel button:not(.sensor-modal-close) {
     justify-self: stretch;
     width: auto;
+  }
+
+  .account-modal {
+    padding: 18px;
+  }
+
+  .account-modal-panel {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 28px 22px 30px;
+  }
+
+  .account-modal-panel label {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .account-modal-panel label span {
+    text-align: left;
+  }
+
+  .account-modal-error,
+  .account-modal-actions {
+    grid-column: 1;
+  }
+
+  .account-modal-actions {
+    flex-wrap: wrap;
   }
 }
