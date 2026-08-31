@@ -264,6 +264,9 @@ const loginError = document.querySelector("#loginError");
 const logoutBtn = document.querySelector("#logoutBtn");
 const alarmRows = document.querySelector("#alarmRows");
 const alarmType = document.querySelector("#alarmType");
+const floorFilter = document.querySelector("#floorFilter");
+const dateFilter = document.querySelector("#dateFilter");
+const timeFilter = document.querySelector("#timeFilter");
 const alarmSettingModal = document.querySelector("#alarmSettingModal");
 const alarmPhoneFields = document.querySelector("#alarmPhoneFields");
 const alarmMessageFields = document.querySelector("#alarmMessageFields");
@@ -289,6 +292,12 @@ const sensorTempHigh = document.querySelector("#sensorTempHigh");
 const sensorTempLow = document.querySelector("#sensorTempLow");
 const sensorHumidityHigh = document.querySelector("#sensorHumidityHigh");
 const sensorHumidityLow = document.querySelector("#sensorHumidityLow");
+const ivsEditModal = document.querySelector("#ivsEditModal");
+const ivsCameraInput = document.querySelector("#ivsCameraInput");
+const ivsAddressInput = document.querySelector("#ivsAddressInput");
+const ivsAssistCameraInput = document.querySelector("#ivsAssistCameraInput");
+const ivsAssistAddressInput = document.querySelector("#ivsAssistAddressInput");
+const ivsThresholdInput = document.querySelector("#ivsThresholdInput");
 const sensorTableBody = document.querySelector("#sensorView .sensor-table tbody");
 const sensorTableTools = document.querySelector("#sensorView .sensor-table-tools");
 const sensorTableWrap = document.querySelector("#sensorView .sensor-table-wrap");
@@ -319,6 +328,7 @@ const accountRoleInput = document.querySelector("#accountRoleInput");
 const accountModalError = document.querySelector("#accountModalError");
 let accessStep = 1;
 let editingSensorRow = null;
+let editingIvsRef = null;
 let currentSensorType = "煙霧偵測";
 
 const defaultSensorThresholds = {
@@ -371,13 +381,36 @@ function showView(name) {
   }
 }
 
-function renderAlarms(filter = "") {
+function getAlarmFilters() {
+  return {
+    type: alarmType?.value || "",
+    floor: floorFilter?.value || "",
+    date: dateFilter?.value || "",
+    time: timeFilter?.value || "",
+  };
+}
+
+function alarmMatchesFilters(row, filters) {
+  const [type, location, , happenedAt] = row;
+  const [date = "", time = ""] = happenedAt.split(" ");
+  return (!filters.type || type === filters.type)
+    && (!filters.floor || location.includes(filters.floor))
+    && (!filters.date || date === filters.date)
+    && (!filters.time || time === filters.time);
+}
+
+function renderAlarms() {
   if (!alarmRows) return;
-  const rows = alarmData.filter((row) => !filter || row[0] === filter);
+  const filters = getAlarmFilters();
+  const rows = alarmData.filter((row) => alarmMatchesFilters(row, filters));
   alarmRows.innerHTML = rows.map((row) => {
     const cells = row.map((cell) => `<td>${cell}</td>`).join("");
     return `<tr>${cells}<td><span class="mail-cell" aria-label="已發送"></span></td></tr>`;
   }).join("");
+
+  if (!rows.length) {
+    alarmRows.innerHTML = `<tr><td colspan="6">查無符合搜尋條件的警報資料</td></tr>`;
+  }
 }
 
 function renderAlarmSettingFields() {
@@ -570,7 +603,7 @@ function renderSensors(type = currentSensorType) {
 function renderIvsSensors() {
   if (!sensorIvsPanel) return;
 
-  sensorIvsPanel.innerHTML = ivsDetectionGroups.map((group) => `
+  sensorIvsPanel.innerHTML = ivsDetectionGroups.map((group, groupIndex) => `
     <section class="ivs-group">
       <h3>${escapeHtml(group.title)}</h3>
       <div class="ivs-grid ivs-head">
@@ -582,17 +615,17 @@ function renderIvsSensors() {
         <span>偵測警戒值</span>
         <span></span>
       </div>
-      ${group.rows.map((row) => {
+      ${group.rows.map((row, rowIndex) => {
         const [status, camera, address, assistCamera, assistAddress, threshold] = row.map(escapeHtml);
         return `
-          <div class="ivs-grid ivs-row">
-            <span><i class="ivs-status ${status === "on" ? "is-on" : ""}"></i></span>
+          <div class="ivs-grid ivs-row" data-ivs-group="${groupIndex}" data-ivs-row="${rowIndex}">
+            <span><button class="ivs-status-button" type="button" data-ivs-toggle aria-label="切換 ${camera} 警報啟動狀態"><i class="ivs-status ${status === "on" ? "is-on" : ""}"></i></button></span>
             <strong>${camera}</strong>
             <strong>${address}</strong>
             <strong>${assistCamera}</strong>
             <strong>${assistAddress}</strong>
             <strong>${threshold}</strong>
-            <button type="button" aria-label="編輯 ${camera}">✎</button>
+            <button type="button" data-ivs-edit aria-label="編輯 ${camera}">✎</button>
           </div>
         `;
       }).join("")}
@@ -760,7 +793,7 @@ function exportCalendarCsv() {
       .map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",");
   });
   const csv = ["日期,星期,假日類型,說明備註", ...rows].join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -771,10 +804,12 @@ function exportCalendarCsv() {
 
 function exportCsv() {
   const visibleRows = [...alarmRows.querySelectorAll("tr")].map((tr) => {
-    return [...tr.querySelectorAll("td")].slice(0, 5).map((td) => `"${td.textContent.trim()}"`).join(",");
-  });
+    const cells = [...tr.querySelectorAll("td")].slice(0, 5);
+    if (cells.length < 5) return "";
+    return cells.map((td) => `"${td.textContent.trim().replace(/"/g, '""')}"`).join(",");
+  }).filter(Boolean);
   const csv = ["警報點,位置,告警訊息,發生時間,處理狀態", ...visibleRows].join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -962,6 +997,33 @@ function closeSensorEditModal() {
   editingSensorRow = null;
 }
 
+function openIvsEditModal(row) {
+  if (!ivsEditModal || !row) return;
+
+  const groupIndex = Number(row.dataset.ivsGroup);
+  const rowIndex = Number(row.dataset.ivsRow);
+  const rowData = ivsDetectionGroups[groupIndex]?.rows[rowIndex];
+  if (!rowData) return;
+
+  editingIvsRef = { groupIndex, rowIndex };
+  ivsCameraInput.value = rowData[1];
+  ivsAddressInput.value = rowData[2];
+  ivsAssistCameraInput.value = rowData[3];
+  ivsAssistAddressInput.value = rowData[4];
+  ivsThresholdInput.value = rowData[5];
+  ivsEditModal.classList.add("is-visible");
+  ivsEditModal.setAttribute("aria-hidden", "false");
+  ivsCameraInput.focus();
+}
+
+function closeIvsEditModal() {
+  if (!ivsEditModal) return;
+
+  ivsEditModal.classList.remove("is-visible");
+  ivsEditModal.setAttribute("aria-hidden", "true");
+  editingIvsRef = null;
+}
+
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(loginForm);
@@ -1049,7 +1111,29 @@ document.addEventListener("click", (event) => {
     closeSensorEditModal();
   }
 
-  if (event.target.closest("#alarmSettingBtn")) {
+  const ivsToggle = event.target.closest("[data-ivs-toggle]");
+  if (ivsToggle) {
+    const row = ivsToggle.closest("[data-ivs-group][data-ivs-row]");
+    const groupIndex = Number(row?.dataset.ivsGroup);
+    const rowIndex = Number(row?.dataset.ivsRow);
+    const rowData = ivsDetectionGroups[groupIndex]?.rows[rowIndex];
+    if (rowData) {
+      rowData[0] = rowData[0] === "on" ? "off" : "on";
+      renderIvsSensors();
+      showAlarmSettingSuccess(rowData[0] === "on" ? "IVS 警報已啟動" : "IVS 警報已關閉");
+    }
+  }
+
+  const ivsEditButton = event.target.closest("[data-ivs-edit]");
+  if (ivsEditButton) {
+    openIvsEditModal(ivsEditButton.closest("[data-ivs-group][data-ivs-row]"));
+  }
+
+  if (event.target === ivsEditModal || event.target.closest(".ivs-edit-modal .sensor-modal-close")) {
+    closeIvsEditModal();
+  }
+
+  if (event.target.closest("#alarmSettingBtn") || event.target.closest("[data-sensor-alarm-setting]")) {
     openAlarmSettingModal();
   }
 
@@ -1205,6 +1289,9 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && sensorEditModal?.classList.contains("is-visible")) {
     closeSensorEditModal();
   }
+  if (event.key === "Escape" && ivsEditModal?.classList.contains("is-visible")) {
+    closeIvsEditModal();
+  }
   if (event.key === "Escape" && calendarModal?.classList.contains("is-visible")) {
     closeCalendarModal();
   }
@@ -1337,15 +1424,32 @@ sensorEditModal?.querySelector("form")?.addEventListener("submit", (event) => {
   closeSensorEditModal();
 });
 
+ivsEditModal?.querySelector("form")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!editingIvsRef) return;
+
+  const rowData = ivsDetectionGroups[editingIvsRef.groupIndex]?.rows[editingIvsRef.rowIndex];
+  if (!rowData) return;
+
+  rowData[1] = ivsCameraInput.value.trim();
+  rowData[2] = ivsAddressInput.value.trim();
+  rowData[3] = ivsAssistCameraInput.value.trim();
+  rowData[4] = ivsAssistAddressInput.value.trim();
+  rowData[5] = ivsThresholdInput.value.trim();
+  closeIvsEditModal();
+  renderIvsSensors();
+  showAlarmSettingSuccess("IVS 防盜設定已更新");
+});
+
 sensorHeaderCheckbox?.addEventListener("change", (event) => {
   document.querySelectorAll("#sensorView .sensor-table tbody input[type='checkbox']").forEach((checkbox) => {
     checkbox.checked = event.target.checked;
   });
 });
 
-if (alarmType) {
-  alarmType.addEventListener("change", () => renderAlarms(alarmType.value));
-}
+[alarmType, floorFilter, dateFilter, timeFilter].forEach((filter) => {
+  filter?.addEventListener("change", renderAlarms);
+});
 
 const exportBtn = document.querySelector("#exportBtn");
 if (exportBtn) {

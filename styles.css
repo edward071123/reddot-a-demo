@@ -2124,8 +2124,10 @@ td:nth-child(3) { text-align: left; }
 
 .alarm-checks {
   display: flex;
+  flex-wrap: wrap;
   gap: 22px;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .alarm-setting-options input {
@@ -2939,8 +2941,18 @@ td:nth-child(3) { text-align: left; }
 }
 
 .ivs-row > span,
-.ivs-row button {
+.ivs-row > button {
   justify-self: center;
+}
+
+.ivs-status-button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
 }
 
 .ivs-status {
@@ -2954,7 +2966,7 @@ td:nth-child(3) { text-align: left; }
   background: #ff1828;
 }
 
-.ivs-row button {
+.ivs-row > button {
   border: 0;
   padding: 0;
   color: #5f6063;

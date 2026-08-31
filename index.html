@@ -162,6 +162,7 @@
             </label>
             <label>樓層
               <select id="floorFilter">
+                <option value="">全部</option>
                 <option>4F</option>
                 <option>3F</option>
                 <option>2F</option>
@@ -170,6 +171,7 @@
             </label>
             <label>日期
               <select id="dateFilter">
+                <option value="">全部</option>
                 <option>2026.01.29</option>
                 <option>2026.01.15</option>
                 <option>2026.01.03</option>
@@ -179,6 +181,7 @@
             </label>
             <label>時間
               <select id="timeFilter">
+                <option value="">全部</option>
                 <option>13:00</option>
                 <option>08:30</option>
                 <option>22:00</option>
@@ -412,7 +415,7 @@
 
           <div class="sensor-management-head">
             <h2>感應器 <span>|</span> 警報觸發管理</h2>
-            <button type="button">警報設定完成</button>
+            <button type="button" data-sensor-alarm-setting>警報設定</button>
           </div>
 
           <div class="sensor-table-tools">
@@ -507,6 +510,8 @@
         <section class="alarm-setting-options">
           <label class="alarm-radio"><input type="radio" name="alarmSendMode" checked /> 傳送簡訊</label>
           <div class="alarm-checks">
+            <label><input type="checkbox" checked /> 傳送 E-mail</label>
+            <label><input type="checkbox" checked /> 系統警報</label>
             <label><input type="checkbox" /> 傳送警報解除</label>
             <label><input type="checkbox" checked /> 傳送警報持續</label>
           </div>
@@ -575,6 +580,33 @@
         <label>
           <span>設備描述 / 備註</span>
           <textarea id="sensorEditNote" name="note"></textarea>
+        </label>
+        <button type="submit">修 改 完 成</button>
+      </form>
+    </div>
+
+    <div id="ivsEditModal" class="sensor-modal ivs-edit-modal" aria-hidden="true">
+      <form class="sensor-modal-panel" aria-label="修改 IVS 防盜設定">
+        <button class="sensor-modal-close" type="button" aria-label="關閉 IVS 修改視窗">×</button>
+        <label>
+          <span>IVS 攝影機</span>
+          <input id="ivsCameraInput" name="camera" />
+        </label>
+        <label>
+          <span>位　址</span>
+          <input id="ivsAddressInput" name="address" />
+        </label>
+        <label>
+          <span>輔助角度攝影機</span>
+          <input id="ivsAssistCameraInput" name="assistCamera" />
+        </label>
+        <label>
+          <span>輔助位址</span>
+          <input id="ivsAssistAddressInput" name="assistAddress" />
+        </label>
+        <label>
+          <span>偵測警戒值</span>
+          <input id="ivsThresholdInput" name="threshold" />
         </label>
         <button type="submit">修 改 完 成</button>
       </form>
