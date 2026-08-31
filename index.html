@@ -189,7 +189,7 @@
                 <option>08:23</option>
               </select>
             </label>
-            <button id="alarmSettingBtn" class="alarm-setting-open" type="button">警報設定</button>
+            <button id="alarmSettingBtn" class="alarm-setting-open" type="button">通知設定</button>
           </div>
           <table class="alarm-table">
             <thead><tr><th>警報點</th><th>位置</th><th>告警訊息</th><th>發生時間</th><th>處理狀態</th><th>發送紀錄</th></tr></thead>
@@ -368,7 +368,7 @@
             <label>檢視年份 <input id="calendarYear" type="number" min="2000" max="2099" value="2026" /></label>
             <button class="calendar-action is-primary" id="calendarManualBtn" type="button">＋ 手動新增假期（可跨年月日）</button>
             <button class="calendar-action is-warning" id="calendarBatchBtn" type="button">批次產生 2026 全年週末例假日</button>
-            <button class="calendar-action is-success" id="calendarExportBtn" type="button">匯出門禁卡機假日表（CSV）</button>
+            <button class="calendar-action is-success" id="calendarExportBtn" type="button">匯出門禁卡機假日表（Excel）</button>
           </div>
 
           <div class="calendar-content">
@@ -510,7 +510,6 @@
         <section class="alarm-setting-options">
           <label class="alarm-radio"><input type="radio" name="alarmSendMode" checked /> 傳送簡訊</label>
           <div class="alarm-checks">
-            <label><input type="checkbox" checked /> 傳送 E-mail</label>
             <label><input type="checkbox" checked /> 系統警報</label>
             <label><input type="checkbox" /> 傳送警報解除</label>
             <label><input type="checkbox" checked /> 傳送警報持續</label>
@@ -536,10 +535,6 @@
         </div>
 
         <footer class="alarm-setting-actions">
-          <button type="button" data-alarm-upload>上傳資料</button>
-          <button type="button" data-alarm-read>讀取資料</button>
-          <button type="button" data-alarm-log>查看紀錄</button>
-          <button type="button" data-alarm-network>設定網路</button>
           <button class="is-save" type="submit">儲存設定</button>
         </footer>
       </form>

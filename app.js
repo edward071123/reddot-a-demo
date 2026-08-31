@@ -785,37 +785,222 @@ function showCalendarSuccess(message) {
   }, 2200);
 }
 
-function exportCalendarCsv() {
-  const rows = getCalendarListRows().map((row) => {
-    const date = new Date(`${row.dateKey}T00:00:00`);
-    const type = calendarTypeMeta[row.type] || calendarTypeMeta.workday;
-    return [row.dateKey, calendarWeekdays[date.getDay()], type.label, row.note]
-      .map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",");
+const textEncoder = new TextEncoder();
+
+function toUtf8Bytes(value) {
+  return textEncoder.encode(value);
+}
+
+function xmlEscape(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&apos;",
+  }[char]));
+}
+
+function getExcelColumnName(index) {
+  let column = "";
+  let value = index + 1;
+  while (value > 0) {
+    const remainder = (value - 1) % 26;
+    column = String.fromCharCode(65 + remainder) + column;
+    value = Math.floor((value - 1) / 26);
+  }
+  return column;
+}
+
+function makeWorksheetXml(rows) {
+  const sheetRows = rows.map((row, rowIndex) => {
+    const cells = row.map((cell, columnIndex) => {
+      const ref = `${getExcelColumnName(columnIndex)}${rowIndex + 1}`;
+      return `<c r="${ref}" t="inlineStr"><is><t>${xmlEscape(cell)}</t></is></c>`;
+    }).join("");
+    return `<row r="${rowIndex + 1}">${cells}</row>`;
+  }).join("");
+
+  const lastColumn = getExcelColumnName(Math.max(...rows.map((row) => row.length), 1) - 1);
+  const lastRow = Math.max(rows.length, 1);
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+    + `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">`
+    + `<dimension ref="A1:${lastColumn}${lastRow}"/>`
+    + `<sheetViews><sheetView workbookViewId="0"/></sheetViews>`
+    + `<sheetFormatPr defaultRowHeight="18"/>`
+    + `<sheetData>${sheetRows}</sheetData>`
+    + `</worksheet>`;
+}
+
+function makeCrcTable() {
+  return Array.from({ length: 256 }, (_, index) => {
+    let value = index;
+    for (let bit = 0; bit < 8; bit += 1) {
+      value = (value & 1) ? (0xedb88320 ^ (value >>> 1)) : (value >>> 1);
+    }
+    return value >>> 0;
   });
-  const csv = ["日期,星期,假日類型,說明備註", ...rows].join("\n");
-  const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
+}
+
+const crcTable = makeCrcTable();
+
+function crc32(bytes) {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc = crcTable[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function writeUint16(bytes, offset, value) {
+  bytes[offset] = value & 0xff;
+  bytes[offset + 1] = (value >>> 8) & 0xff;
+}
+
+function writeUint32(bytes, offset, value) {
+  bytes[offset] = value & 0xff;
+  bytes[offset + 1] = (value >>> 8) & 0xff;
+  bytes[offset + 2] = (value >>> 16) & 0xff;
+  bytes[offset + 3] = (value >>> 24) & 0xff;
+}
+
+function makeZip(entries) {
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+
+  entries.forEach((entry) => {
+    const nameBytes = toUtf8Bytes(entry.name);
+    const dataBytes = toUtf8Bytes(entry.content);
+    const crc = crc32(dataBytes);
+
+    const localHeader = new Uint8Array(30 + nameBytes.length);
+    writeUint32(localHeader, 0, 0x04034b50);
+    writeUint16(localHeader, 4, 20);
+    writeUint16(localHeader, 6, 0x0800);
+    writeUint16(localHeader, 8, 0);
+    writeUint16(localHeader, 10, 0);
+    writeUint16(localHeader, 12, 0);
+    writeUint32(localHeader, 14, crc);
+    writeUint32(localHeader, 18, dataBytes.length);
+    writeUint32(localHeader, 22, dataBytes.length);
+    writeUint16(localHeader, 26, nameBytes.length);
+    writeUint16(localHeader, 28, 0);
+    localHeader.set(nameBytes, 30);
+
+    const centralHeader = new Uint8Array(46 + nameBytes.length);
+    writeUint32(centralHeader, 0, 0x02014b50);
+    writeUint16(centralHeader, 4, 20);
+    writeUint16(centralHeader, 6, 20);
+    writeUint16(centralHeader, 8, 0x0800);
+    writeUint16(centralHeader, 10, 0);
+    writeUint16(centralHeader, 12, 0);
+    writeUint16(centralHeader, 14, 0);
+    writeUint32(centralHeader, 16, crc);
+    writeUint32(centralHeader, 20, dataBytes.length);
+    writeUint32(centralHeader, 24, dataBytes.length);
+    writeUint16(centralHeader, 28, nameBytes.length);
+    writeUint16(centralHeader, 30, 0);
+    writeUint16(centralHeader, 32, 0);
+    writeUint16(centralHeader, 34, 0);
+    writeUint16(centralHeader, 36, 0);
+    writeUint32(centralHeader, 38, 0);
+    writeUint32(centralHeader, 42, offset);
+    centralHeader.set(nameBytes, 46);
+
+    localParts.push(localHeader, dataBytes);
+    centralParts.push(centralHeader);
+    offset += localHeader.length + dataBytes.length;
+  });
+
+  const centralSize = centralParts.reduce((size, part) => size + part.length, 0);
+  const endRecord = new Uint8Array(22);
+  writeUint32(endRecord, 0, 0x06054b50);
+  writeUint16(endRecord, 8, entries.length);
+  writeUint16(endRecord, 10, entries.length);
+  writeUint32(endRecord, 12, centralSize);
+  writeUint32(endRecord, 16, offset);
+
+  return new Blob([...localParts, ...centralParts, endRecord], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+}
+
+function makeExcelWorkbook(rows, sheetName = "Sheet1") {
+  const safeSheetName = sheetName.replace(/[\\/:*?\[\]]/g, "").slice(0, 31) || "Sheet1";
+  return makeZip([
+    {
+      name: "[Content_Types].xml",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+        + `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">`
+        + `<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>`
+        + `<Default Extension="xml" ContentType="application/xml"/>`
+        + `<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>`
+        + `<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`
+        + `</Types>`,
+    },
+    {
+      name: "_rels/.rels",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+        + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`
+        + `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>`
+        + `</Relationships>`,
+    },
+    {
+      name: "xl/workbook.xml",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+        + `<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">`
+        + `<sheets><sheet name="${xmlEscape(safeSheetName)}" sheetId="1" r:id="rId1"/></sheets>`
+        + `</workbook>`,
+    },
+    {
+      name: "xl/_rels/workbook.xml.rels",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+        + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`
+        + `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>`
+        + `</Relationships>`,
+    },
+    {
+      name: "xl/worksheets/sheet1.xml",
+      content: makeWorksheetXml(rows.length ? rows : [[""]]),
+    },
+  ]);
+}
+
+function downloadExcel(rows, filename, sheetName) {
+  const blob = makeExcelWorkbook(rows, sheetName);
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `calendar-${calendarYear}.csv`;
+  link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
 }
 
-function exportCsv() {
+function exportCalendarExcel() {
+  const rows = getCalendarListRows().map((row) => {
+    const date = new Date(`${row.dateKey}T00:00:00`);
+    const type = calendarTypeMeta[row.type] || calendarTypeMeta.workday;
+    return [row.dateKey, calendarWeekdays[date.getDay()], type.label, row.note];
+  });
+  downloadExcel(
+    [["日期", "星期", "假日類型", "說明備註"], ...rows],
+    `calendar-${calendarYear}.xlsx`,
+    "門禁假日表",
+  );
+}
+
+function exportExcel() {
   const visibleRows = [...alarmRows.querySelectorAll("tr")].map((tr) => {
     const cells = [...tr.querySelectorAll("td")].slice(0, 5);
     if (cells.length < 5) return "";
-    return cells.map((td) => `"${td.textContent.trim().replace(/"/g, '""')}"`).join(",");
+    return cells.map((td) => td.textContent.trim());
   }).filter(Boolean);
-  const csv = ["警報點,位置,告警訊息,發生時間,處理狀態", ...visibleRows].join("\n");
-  const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "alarm-report.csv";
-  link.click();
-  URL.revokeObjectURL(url);
+  downloadExcel(
+    [["警報點", "位置", "告警訊息", "發生時間", "處理狀態"], ...visibleRows],
+    "alarm-report.xlsx",
+    "警報資料",
+  );
 }
 
 function splitReading(value) {
@@ -1186,23 +1371,6 @@ document.addEventListener("click", (event) => {
     closeAlarmSettingModal();
   }
 
-  if (event.target.closest("[data-alarm-upload]")) {
-    showAlarmSettingSuccess("上傳資料成功");
-  }
-
-  if (event.target.closest("[data-alarm-read]")) {
-    renderAlarmSettingFields();
-    showAlarmSettingSuccess("讀取資料成功");
-  }
-
-  if (event.target.closest("[data-alarm-log]")) {
-    showAlarmSettingSuccess("已開啟模擬紀錄");
-  }
-
-  if (event.target.closest("[data-alarm-network]")) {
-    showAlarmSettingSuccess("網路設定成功");
-  }
-
   if (event.target.closest("#calendarManualBtn")) {
     openCalendarModal(formatCalendarDate(new Date(calendarYear, calendarMonth, 1)));
   }
@@ -1220,7 +1388,7 @@ document.addEventListener("click", (event) => {
   }
 
   if (event.target.closest("#calendarExportBtn")) {
-    exportCalendarCsv();
+    exportCalendarExcel();
   }
 
   if (event.target.closest("[data-calendar-prev]")) {
@@ -1453,7 +1621,7 @@ sensorHeaderCheckbox?.addEventListener("change", (event) => {
 
 const exportBtn = document.querySelector("#exportBtn");
 if (exportBtn) {
-  exportBtn.addEventListener("click", exportCsv);
+  exportBtn.addEventListener("click", exportExcel);
 }
 
 renderAlarms();
