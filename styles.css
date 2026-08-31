@@ -2110,21 +2110,29 @@ td:nth-child(3) { text-align: left; }
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-content: start;
   gap: 18px;
+  padding-right: 8px;
+  overflow-y: auto;
 }
 
 .alarm-email-card {
   grid-column: 1 / -1;
-  min-height: 230px;
+  min-height: 420px;
 }
 
 .alarm-setting-card {
   min-height: 0;
+  height: min(100%, 560px);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   background: white;
   border: 1px solid #dce4e9;
   overflow: hidden;
+}
+
+.alarm-email-card.alarm-setting-card {
+  height: 420px;
 }
 
 .alarm-setting-card-title {

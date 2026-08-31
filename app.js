@@ -18,7 +18,7 @@ const alarmData = [
   ["跨區警戒", "2F 第一展廳", "跨區安防觸發", "2025.09.07 08:07", "已處理"],
 ];
 
-const alarmSettingPhones = Array.from({ length: 16 }, (_, index) => (
+const alarmSettingPhones = Array.from({ length: 6 }, (_, index) => (
   index === 1 ? "0921221545" : ""
 ));
 
@@ -33,7 +33,6 @@ const alarmSettingMessages = [
   "4",
   "5",
   "6",
-  "", "", "", "", "", "", "", "", "", "",
 ];
 
 const roomReadings = {
