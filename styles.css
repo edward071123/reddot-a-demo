@@ -2066,7 +2066,7 @@ td:nth-child(3) { text-align: left; }
   max-height: calc(100vh - 48px);
   min-height: 640px;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 18px;
   padding: 28px;
   color: #23313c;
@@ -2106,41 +2106,16 @@ td:nth-child(3) { text-align: left; }
   line-height: 1;
 }
 
-.alarm-setting-options {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 14px 18px;
-  background: white;
-  border: 1px solid #dce4e9;
-}
-
-.alarm-setting-options label {
-  color: #2d3943;
-  font-size: 16px;
-  font-weight: 900;
-}
-
-.alarm-checks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 22px;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.alarm-setting-options input {
-  width: 17px;
-  height: 17px;
-  vertical-align: -3px;
-}
-
 .alarm-setting-grid {
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
+}
+
+.alarm-email-card {
+  grid-column: 1 / -1;
+  min-height: 230px;
 }
 
 .alarm-setting-card {

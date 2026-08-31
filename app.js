@@ -22,6 +22,10 @@ const alarmSettingPhones = Array.from({ length: 16 }, (_, index) => (
   index === 1 ? "0921221545" : ""
 ));
 
+const alarmSettingEmails = Array.from({ length: 16 }, (_, index) => (
+  index === 1 ? "notify@example.com" : ""
+));
+
 const alarmSettingMessages = [
   "測試簡訊1",
   "測試簡訊123",
@@ -269,6 +273,7 @@ const dateFilter = document.querySelector("#dateFilter");
 const timeFilter = document.querySelector("#timeFilter");
 const alarmSettingModal = document.querySelector("#alarmSettingModal");
 const alarmPhoneFields = document.querySelector("#alarmPhoneFields");
+const alarmEmailFields = document.querySelector("#alarmEmailFields");
 const alarmMessageFields = document.querySelector("#alarmMessageFields");
 const breadcrumbs = document.querySelector("#breadcrumbs");
 const tempValue = document.querySelector("#tempValue");
@@ -419,6 +424,15 @@ function renderAlarmSettingFields() {
       <label class="alarm-setting-row">
         <span>Phone-${index + 1}</span>
         <input name="phone${index + 1}" value="${escapeHtml(value)}" inputmode="tel" />
+      </label>
+    `).join("");
+  }
+
+  if (alarmEmailFields) {
+    alarmEmailFields.innerHTML = alarmSettingEmails.map((value, index) => `
+      <label class="alarm-setting-row">
+        <span>Email-${index + 1}</span>
+        <input name="email${index + 1}" value="${escapeHtml(value)}" inputmode="email" />
       </label>
     `).join("");
   }
@@ -1476,6 +1490,9 @@ alarmSettingModal?.querySelector("form")?.addEventListener("submit", (event) => 
 
   alarmSettingModal.querySelectorAll("[name^='phone']").forEach((input, index) => {
     alarmSettingPhones[index] = input.value.trim();
+  });
+  alarmSettingModal.querySelectorAll("[name^='email']").forEach((input, index) => {
+    alarmSettingEmails[index] = input.value.trim();
   });
   alarmSettingModal.querySelectorAll("[name^='message']").forEach((input, index) => {
     alarmSettingMessages[index] = input.value.trim();
