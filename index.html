@@ -45,14 +45,34 @@
             <span class="nav-icon login-icon"></span>
             <span><strong>Login</strong><small>權限密碼管理</small></span>
           </button>
-          <button class="nav-item" type="button" data-view="access">
-            <span class="nav-icon access-icon"></span>
-            <span><strong>Access</strong><small>門禁管理</small></span>
-          </button>
-          <!-- <button class="nav-item" type="button" data-view="calendar">
-            <span class="nav-icon calendar-icon"></span>
-            <span><strong>Calendar</strong><small>萬年曆</small></span>
-          </button> -->
+          <div class="nav-group" data-nav-group="access">
+            <div class="nav-parent" aria-label="門禁管理">
+              <span class="nav-icon access-icon"></span>
+              <span><strong>Access</strong><small>門禁管理</small></span>
+            </div>
+            <div class="nav-submenu">
+              <button class="nav-item nav-subitem" type="button" data-view="access">
+                <span class="nav-submark"></span>
+                <span><strong>Access Authorization</strong><small>門禁授權</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="accessHistory">
+                <span class="nav-submark"></span>
+                <span><strong>Access History</strong><small>門禁歷史列表</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="workday">
+                <span class="nav-submark"></span>
+                <span><strong>Workday</strong><small>工作日設定</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="timePeriod">
+                <span class="nav-submark"></span>
+                <span><strong>Time Period</strong><small>時段</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="calendar">
+                <span class="nav-submark"></span>
+                <span><strong>Calendar</strong><small>萬年曆</small></span>
+              </button>
+            </div>
+          </div>
           <button class="nav-item" type="button" data-view="sensor">
             <span class="nav-icon sensor-icon"></span>
             <span><strong>Sensor</strong><small>感測器管理</small></span>
@@ -263,8 +283,8 @@
           </div>
         </section>
 
-        <section id="accessView" class="view access-page" aria-label="門禁管理">
-          <div class="access-tabs" aria-label="門禁管理分頁">
+        <section id="accessView" class="view access-page" aria-label="門禁授權">
+          <div class="access-tabs" aria-label="門禁授權分頁">
             <button type="button" data-home>首頁</button>
             <button class="is-active" type="button">門禁授權 <span>×</span></button>
             <button type="button">會員管理 <span>×</span></button>
@@ -355,6 +375,244 @@
               </div>
               <div class="access-actions"><button type="button" data-access-prev>上一步</button><button type="button" data-access-submit>送出</button></div>
             </section>
+          </div>
+        </section>
+
+        <section id="accessHistoryView" class="view access-history-page" aria-label="門禁歷史列表">
+          <div class="access-tabs" aria-label="門禁歷史列表分頁">
+            <button type="button" data-home>首頁</button>
+            <button class="is-active" type="button">門禁歷史列表 <span>×</span></button>
+          </div>
+
+          <div class="history-toolbar">
+            <label class="history-range"><span>◷</span><input id="historyRangeInput" value="2024-09-01 00:00:00  -  2026-10-31 00:00:00" /></label>
+            <label>
+              <select id="historyEventFilter">
+                <option value="">門禁點</option>
+                <option>刷卡事件</option>
+                <option>一般事件</option>
+              </select>
+            </label>
+            <label class="history-search"><span>⌕</span><input id="historySearchInput" placeholder="請輸入搜尋姓名" /></label>
+            <button id="historySearchBtn" class="history-button is-search" type="button">⌕ 搜尋</button>
+            <button id="historyExportBtn" class="history-button is-export" type="button">↓ 匯出Excel</button>
+          </div>
+
+          <div class="history-table-wrap">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>事件地點</th>
+                  <th>卡片號碼</th>
+                  <th>姓名</th>
+                  <th>事件</th>
+                  <th>進出</th>
+                  <th>日期時間</th>
+                </tr>
+              </thead>
+              <tbody id="accessHistoryRows"></tbody>
+            </table>
+          </div>
+
+          <div class="history-pagination">
+            <span id="historyCount">共 38 項</span>
+            <select aria-label="每頁筆數"><option>10項/頁</option></select>
+            <nav aria-label="門禁歷史分頁">
+              <button type="button" disabled>‹</button>
+              <button class="is-current" type="button">1</button>
+              <button type="button">2</button>
+              <button type="button">3</button>
+              <button type="button">4</button>
+              <button type="button">›</button>
+            </nav>
+            <label>前往 <input value="1" inputmode="numeric" /> 頁</label>
+          </div>
+        </section>
+
+        <section id="workdayView" class="view workday-page" aria-label="工作日設定">
+          <div class="access-tabs" aria-label="工作日設定分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="accessHistory">門禁歷史列表 <span>×</span></button>
+            <button class="is-active" type="button">工作日設定 <span>×</span></button>
+            <button type="button" data-view="timePeriod">時段 <span>×</span></button>
+          </div>
+
+          <div class="workday-command">
+            <button type="button">更新所有工作日</button>
+          </div>
+
+          <div class="workday-page-tabs" aria-label="工作日組別">
+            <button class="is-active" type="button">1</button>
+            <button type="button">2</button>
+            <button type="button">3</button>
+            <button type="button">4</button>
+            <button type="button">5</button>
+            <button type="button">6</button>
+            <button type="button">7</button>
+            <button type="button">8</button>
+          </div>
+
+          <div class="workday-table-wrap">
+            <table class="workday-table">
+              <thead>
+                <tr>
+                  <th>工作日名稱</th>
+                  <th>週日</th>
+                  <th>週一</th>
+                  <th>週二</th>
+                  <th>週三</th>
+                  <th>週四</th>
+                  <th>週五</th>
+                  <th>週六</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input value="全時段" /></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                </tr>
+                <tr>
+                  <td><input value="門禁解除時段" /></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                  <td><select><option>全時段 00:00-23:59</option></select></td>
+                </tr>
+                <tr>
+                  <td><input value="1F2F自動門解除" /></td>
+                  <td><select><option>自動門時段 07:00-19:00</option></select></td>
+                  <td><select><option>自動門時段 07:00-19:00</option></select></td>
+                  <td><select><option>自動門時段 07:00-19:00</option></select></td>
+                  <td><select><option>自動門時段 07:00-19:00</option></select></td>
+                  <td><select><option>自動門時段 07:00-19:00</option></select></td>
+                  <td><select><option>自動門時段 07:00-19:00</option></select></td>
+                  <td><select><option>自動門時段 07:00-19:00</option></select></td>
+                </tr>
+                <tr>
+                  <td><input value="臨時自動門時段" /></td>
+                  <td><select><option>臨時自動門時段 07:00-18:00</option></select></td>
+                  <td><select><option>臨時自動門時段 07:00-18:00</option></select></td>
+                  <td><select><option>臨時自動門時段 07:00-18:00</option></select></td>
+                  <td><select><option>臨時自動門時段 07:00-18:00</option></select></td>
+                  <td><select><option>臨時自動門時段 07:00-18:00</option></select></td>
+                  <td><select><option>臨時自動門時段 07:00-18:00</option></select></td>
+                  <td><select><option>臨時自動門時段 07:00-18:00</option></select></td>
+                </tr>
+                <tr>
+                  <td><input value="空白時段" /></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                </tr>
+                <tr>
+                  <td><input placeholder="工作日名稱" /></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                </tr>
+                <tr>
+                  <td><input placeholder="工作日名稱" /></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                  <td><select><option>不授權 00:00-00:00</option></select></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="timePeriodView" class="view time-period-page" aria-label="時段">
+          <div class="access-tabs" aria-label="時段分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="accessHistory">門禁歷史列表 <span>×</span></button>
+            <button type="button" data-view="workday">工作日設定 <span>×</span></button>
+            <button class="is-active" type="button">時段 <span>×</span></button>
+          </div>
+
+          <div class="time-period-band"></div>
+
+          <div class="time-period-table-wrap">
+            <table class="time-period-table">
+              <thead>
+                <tr>
+                  <th>TimeSec Id</th>
+                  <th>時段名稱</th>
+                  <th>起始時間</th>
+                  <th>結束時間</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td><input value="全時段" /></td>
+                  <td><select><option>00:00</option></select></td>
+                  <td><select><option>23:59</option></select></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td><input value="自動門時段" /></td>
+                  <td><select><option>07:00</option></select></td>
+                  <td><select><option>19:00</option></select></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><input value="臨時自動門時段" /></td>
+                  <td><select><option>07:00</option></select></td>
+                  <td><select><option>10:00</option></select></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td><input value="機房" /></td>
+                  <td><select><option>07:00</option></select></td>
+                  <td><select><option>07:00</option></select></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td><input value="空白時段" /></td>
+                  <td><select><option>00:00</option></select></td>
+                  <td><select><option>00:00</option></select></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td><input value="6" /></td>
+                  <td><select><option>請選擇</option></select></td>
+                  <td><select><option>請選擇</option></select></td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td><input value="7" /></td>
+                  <td><select><option>請選擇</option></select></td>
+                  <td><select><option>請選擇</option></select></td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td><input value="8" /></td>
+                  <td><select><option>請選擇</option></select></td>
+                  <td><select><option>請選擇</option></select></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
 

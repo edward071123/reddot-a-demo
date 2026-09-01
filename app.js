@@ -18,6 +18,31 @@ const alarmData = [
   ["跨區警戒", "2F 第一展廳", "跨區安防觸發", "2025.09.07 08:07", "已解除"],
 ];
 
+const accessHistoryData = [
+  ["1F 大廳入口閘門", "0989321456", "", "刷卡事件:無此卡號", "進", "2025/01/06 09:57:01"],
+  ["1F 大廳入口閘門", "0989321456", "", "刷卡事件:無此卡號", "進", "2025/01/06 09:56:52"],
+  ["1F 大廳入口閘門", "0989321456", "", "刷卡事件:無此卡號", "進", "2025/01/06 09:55:55"],
+  ["2F 特展廳管制門", "", "", "一般事件:裝置連線4", "", "2025/01/06 09:30:16"],
+  ["B1 機房讀卡機", "", "", "一般事件:讀卡機重開機0", "", "2025/01/06 09:30:16"],
+  ["2F 特展廳管制門", "", "", "一般事件:裝置連線4", "", "2025/01/02 15:44:02"],
+  ["B1 機房讀卡機", "", "", "一般事件:讀卡機重開機0", "", "2025/01/02 15:44:02"],
+  ["4F 典藏庫側門", "", "", "一般事件:裝置離線4", "", "2025/01/02 15:34:44"],
+  ["南側員工門", "0987888888", "", "刷卡事件:無此卡號", "進", "2025/01/02 15:06:04"],
+  ["南側員工門", "0987888888", "", "刷卡事件:卡片時效已過", "進", "2025/01/02 15:05:31"],
+  ["南側員工門", "3265708516", "王志明", "刷卡事件:授權通過", "進", "2025/01/02 08:42:15"],
+  ["典藏庫房門", "0831011879", "林佳蓉", "刷卡事件:授權通過", "出", "2025/01/01 18:22:06"],
+  ...Array.from({ length: 26 }, (_, index) => {
+    const locations = ["北側管制門", "1F 員工入口", "2F 展廳管制門", "3F 行政辦公室", "4F 典藏庫房門", "B2 停車場電梯廳"];
+    const day = String(31 - Math.floor(index / 3)).padStart(2, "0");
+    const minute = String(50 - index).padStart(2, "0");
+    const card = index % 4 === 0 ? "0839848711" : index % 3 === 0 ? "0840222999" : "";
+    const name = index % 4 === 0 ? "陳建宏" : index % 3 === 0 ? "張雅婷" : "";
+    const eventName = index % 2 === 0 ? "一般事件:裝置連線4" : "刷卡事件:授權通過";
+    const direction = eventName.startsWith("刷卡事件") ? (index % 3 === 0 ? "出" : "進") : "";
+    return [locations[index % locations.length], card, name, eventName, direction, `2024/12/${day} 14:${minute}:08`];
+  }),
+];
+
 const alarmSettingPhones = Array.from({ length: 6 }, (_, index) => (
   index === 1 ? "0921221545" : ""
 ));
@@ -250,9 +275,21 @@ const viewMeta = {
     id: "accessView",
     crumb: "門禁管理 / 門禁授權",
   },
+  accessHistory: {
+    id: "accessHistoryView",
+    crumb: "門禁管理 / 門禁歷史列表",
+  },
+  workday: {
+    id: "workdayView",
+    crumb: "門禁管理 / 工作日設定",
+  },
+  timePeriod: {
+    id: "timePeriodView",
+    crumb: "門禁管理 / 時段",
+  },
   calendar: {
     id: "calendarView",
-    crumb: "單位管理 / 萬年曆",
+    crumb: "門禁管理 / 萬年曆",
   },
   sensor: {
     id: "sensorView",
@@ -317,6 +354,10 @@ const calendarModal = document.querySelector("#calendarModal");
 const calendarModalTitle = document.querySelector("#calendarModalTitle");
 const calendarDateInput = document.querySelector("#calendarDateInput");
 const calendarNoteInput = document.querySelector("#calendarNoteInput");
+const accessHistoryRows = document.querySelector("#accessHistoryRows");
+const historyCount = document.querySelector("#historyCount");
+const historyEventFilter = document.querySelector("#historyEventFilter");
+const historySearchInput = document.querySelector("#historySearchInput");
 const accountRows = document.querySelector("#accountRows");
 const accountCount = document.querySelector("#accountCount");
 const accountSearchInput = document.querySelector("#accountSearchInput");
@@ -378,6 +419,10 @@ function showView(name) {
   document.querySelector(`#${meta.id}`).classList.add("is-current");
   document.querySelectorAll(".nav-item").forEach((item) => {
     item.classList.toggle("is-active", item.dataset.view === name);
+  });
+  document.querySelectorAll("[data-nav-group]").forEach((item) => {
+    const childViews = [...item.querySelectorAll("[data-view]")].map((button) => button.dataset.view);
+    item.classList.toggle("is-active", childViews.includes(name));
   });
   breadcrumbs.innerHTML = `<button type="button" data-home>首頁</button><span> / ${meta.crumb}</span>`;
   if (name === "security") {
@@ -1003,6 +1048,38 @@ function exportCalendarExcel() {
   );
 }
 
+function getAccessHistoryRows() {
+  const eventType = historyEventFilter?.value || "";
+  const keyword = (historySearchInput?.value || "").trim().toLowerCase();
+  return accessHistoryData.filter((row) => {
+    const [, card, name, eventName] = row;
+    const matchesType = !eventType || eventName.startsWith(eventType);
+    const haystack = `${card} ${name} ${eventName}`.toLowerCase();
+    return matchesType && (!keyword || haystack.includes(keyword));
+  });
+}
+
+function renderAccessHistory() {
+  if (!accessHistoryRows) return;
+  const rows = getAccessHistoryRows();
+  const visibleRows = rows.slice(0, 10);
+  accessHistoryRows.innerHTML = visibleRows.map((row) => `
+    <tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>
+  `).join("");
+  if (!rows.length) {
+    accessHistoryRows.innerHTML = `<tr><td colspan="6">查無符合搜尋條件的門禁歷史資料</td></tr>`;
+  }
+  if (historyCount) historyCount.textContent = `共 ${rows.length} 項`;
+}
+
+function exportAccessHistoryExcel() {
+  downloadExcel(
+    [["事件地點", "卡片號碼", "姓名", "事件", "進出", "日期時間"], ...getAccessHistoryRows()],
+    "access-history.xlsx",
+    "門禁歷史列表",
+  );
+}
+
 function exportExcel() {
   const visibleRows = [...alarmRows.querySelectorAll("tr")].map((tr) => {
     const cells = [...tr.querySelectorAll("td")].slice(0, 5);
@@ -1464,6 +1541,14 @@ document.addEventListener("click", (event) => {
   if (event.target.closest("[data-access-submit]")) {
     showAccessSuccess("設定成功");
   }
+
+  if (event.target.closest("#historySearchBtn")) {
+    renderAccessHistory();
+  }
+
+  if (event.target.closest("#historyExportBtn")) {
+    exportAccessHistoryExcel();
+  }
 });
 
 document.addEventListener("keydown", (event) => {
@@ -1635,6 +1720,9 @@ sensorHeaderCheckbox?.addEventListener("change", (event) => {
   filter?.addEventListener("change", renderAlarms);
 });
 
+historyEventFilter?.addEventListener("change", renderAccessHistory);
+historySearchInput?.addEventListener("input", renderAccessHistory);
+
 const exportBtn = document.querySelector("#exportBtn");
 if (exportBtn) {
   exportBtn.addEventListener("click", exportExcel);
@@ -1643,5 +1731,6 @@ if (exportBtn) {
 renderAlarms();
 renderSelectedAccess();
 renderCalendar();
+renderAccessHistory();
 renderSensors();
 renderAccounts();
