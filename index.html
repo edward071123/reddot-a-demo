@@ -37,6 +37,10 @@
           <button class="sidebar-section" type="button" data-home>事務管理</button>
         </div>
         <nav class="main-nav" aria-label="主選單">
+          <button class="nav-item" type="button" data-view="exhibitSecurity">
+            <span class="nav-icon exhibit-icon"></span>
+            <span><strong>Exhibit Security</strong><small>展品安全監控系統</small></span>
+          </button>
           <button class="nav-item" type="button" data-view="security">
             <span class="nav-icon building-icon"></span>
             <span><strong>Building Information</strong><small>監控儀表板</small></span>
@@ -55,9 +59,49 @@
                 <span class="nav-submark"></span>
                 <span><strong>Access Authorization</strong><small>門禁授權</small></span>
               </button>
+              <button class="nav-item nav-subitem" type="button" data-view="personnelAccess">
+                <span class="nav-submark"></span>
+                <span><strong>Personnel Access</strong><small>人員進出</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="visitorBooking">
+                <span class="nav-submark"></span>
+                <span><strong>Visitor Booking</strong><small>訪客預約</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="reservationCard">
+                <span class="nav-submark"></span>
+                <span><strong>Reservation Card</strong><small>預約發卡</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="visitorBookingList">
+                <span class="nav-submark"></span>
+                <span><strong>Visitor List</strong><small>訪客預約清單</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="remoteDoor">
+                <span class="nav-submark"></span>
+                <span><strong>Remote Door</strong><small>遙控開門</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="doorSystem">
+                <span class="nav-submark"></span>
+                <span><strong>Door System</strong><small>門禁系統設備</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="elevatorSystem">
+                <span class="nav-submark"></span>
+                <span><strong>Elevator System</strong><small>電梯系統設備</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="elevatorHistory">
+                <span class="nav-submark"></span>
+                <span><strong>Elevator History</strong><small>電梯歷史列表</small></span>
+              </button>
               <button class="nav-item nav-subitem" type="button" data-view="accessHistory">
                 <span class="nav-submark"></span>
                 <span><strong>Access History</strong><small>門禁歷史列表</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="accessRealtime">
+                <span class="nav-submark"></span>
+                <span><strong>Access Realtime</strong><small>門禁進出即時監控</small></span>
+              </button>
+              <button class="nav-item nav-subitem" type="button" data-view="readerRealtime">
+                <span class="nav-submark"></span>
+                <span><strong>Reader Realtime</strong><small>卡機狀態即時監控</small></span>
               </button>
               <button class="nav-item nav-subitem" type="button" data-view="workday">
                 <span class="nav-submark"></span>
@@ -100,6 +144,87 @@
           <button id="logoutBtn" class="logout-btn" type="button">登出</button>
           <strong>Reddot Smart Building System</strong>
         </header>
+
+        <section id="exhibitSecurityView" class="view exhibit-security-page" aria-label="展品安全監控系統">
+          <header class="exhibit-header">
+            <div><small>展品安全監控系統</small><h1>攝影機設定</h1></div>
+            <nav aria-label="展品安全功能">
+              <button type="button" data-view="exhibitLive">即時監看</button>
+              <button type="button" data-view="exhibitEvents">事件統計</button>
+              <button type="button" data-view="exhibitFlow">人流統計</button>
+              <button type="button" data-view="exhibitLeft">遺留物</button>
+              <button type="button" data-view="exhibitMissing">遺失物</button>
+              <button class="is-active" type="button">攝影機管理</button>
+              <button type="button" data-view="exhibitBackup">備份管理</button>
+            </nav>
+          </header>
+          <div class="exhibit-content">
+            <form id="cameraRegistryForm" class="camera-registry-form">
+              <header><span>CONNECTION PROFILE</span><strong>ADD CAMERA / 新增攝影機</strong></header>
+              <label class="is-wide"><span>NAME / 名稱</span><input id="cameraNameInput" placeholder="例如：辦公室入口" required /></label>
+              <label><span>IP / HOST</span><input id="cameraHostInput" value="192.168.3.111" required /></label>
+              <label><span>PORT</span><input id="cameraPortInput" value="554" inputmode="numeric" required /></label>
+              <label class="is-wide"><span>STREAM PATH / 串流路徑</span><input id="cameraPathInput" value="profile1" required /></label>
+              <label><span>ACCOUNT / 帳號</span><input id="cameraAccountInput" /></label>
+              <label><span>PASSWORD / 密碼</span><input id="cameraPasswordInput" type="password" placeholder="輸入 RTSP 密碼" /></label>
+              <p>密碼只會寫入資料庫；API 與管理畫面不會回傳明文。</p>
+              <button class="camera-add-button" type="submit">建立攝影機</button>
+            </form>
+            <section class="camera-registry-list">
+              <header><span>REGISTERED SOURCES</span></header>
+              <div id="cameraRegistryRows"></div>
+            </section>
+            <aside class="camera-detection-actions" aria-label="影像偵測功能">
+              <label><input type="checkbox" name="cameraDetection" value="motion" /><span>位移偵測</span></label>
+              <label><input type="checkbox" name="cameraDetection" value="line" /><span>跨線偵測</span></label>
+              <label><input type="checkbox" name="cameraDetection" value="intrusion" /><span>入侵偵測</span></label>
+              <label><input type="checkbox" name="cameraDetection" value="loitering" /><span>徘徊偵測</span></label>
+              <label><input type="checkbox" name="cameraDetection" value="thermal" /><span>紅外線偵測熱偵</span></label>
+              <button class="camera-return" type="button" data-view="exhibitLive">返回即時監看</button>
+            </aside>
+          </div>
+        </section>
+
+        <section id="exhibitLiveView" class="view exhibit-module-page" aria-label="即時監看">
+          <header class="exhibit-header">
+            <div><small>展品安全監控系統</small><h1>即時監看</h1></div>
+            <nav aria-label="展品安全功能"><button class="is-active" type="button">即時監看</button><button type="button" data-view="exhibitEvents">事件統計</button><button type="button" data-view="exhibitFlow">人流統計</button><button type="button" data-view="exhibitLeft">遺留物</button><button type="button" data-view="exhibitMissing">遺失物</button><button type="button" data-view="exhibitSecurity">攝影機管理</button><button type="button" data-view="exhibitBackup">備份管理</button></nav>
+          </header>
+          <div class="exhibit-live-body">
+            <div class="exhibit-page-tools"><label>目前攝影機<select><option>辦公室-space01 · CAM-0001</option></select></label><button type="button" data-camera-tool="baseline">建立物件基準</button><button type="button" data-camera-tool="clear">清除物件</button><button type="button" data-camera-refresh>重新連線</button></div>
+            <figure class="camera-live-frame"><img src="assets/cctv-preview.png" alt="辦公室攝影機即時畫面" /><figcaption><span>LIVE · CAM-0001</span><strong id="cameraLiveTime">即時連線中</strong></figcaption><div class="camera-live-stats"><span>人流 <b>1</b></span><span>擁擠度 <b>3.8%</b></span><span>遺留物 <b>0</b></span><span>遺失物 <b>0</b></span></div></figure>
+          </div>
+        </section>
+
+        <section id="exhibitEventsView" class="view exhibit-module-page" aria-label="事件統計">
+          <header class="exhibit-header"><div><small>展品安全監控系統</small><h1>事件統計</h1></div><nav aria-label="展品安全功能"><button type="button" data-view="exhibitLive">即時監看</button><button class="is-active" type="button">事件統計</button><button type="button" data-view="exhibitFlow">人流統計</button><button type="button" data-view="exhibitLeft">遺留物</button><button type="button" data-view="exhibitMissing">遺失物</button><button type="button" data-view="exhibitSecurity">攝影機管理</button><button type="button" data-view="exhibitBackup">備份管理</button></nav></header>
+          <div class="exhibit-report-body">
+            <div class="exhibit-report-actions"><button type="button" data-view="exhibitLive">返回即時監看</button><button type="button" data-camera-refresh>更新資料</button></div>
+            <div class="exhibit-kpis"><article><span>全部事件</span><strong>951</strong></article><article><span>今日事件</span><strong>2</strong></article><article><span>篩選結果</span><strong id="eventResultCount">2</strong></article></div>
+            <form class="exhibit-filters" id="eventFilters"><label>攝影機<select><option>全部攝影機</option><option>辦公室-space01</option></select></label><label>年份<select><option>2026</option><option>2025</option></select></label><label>日期<input type="date" value="2026-09-18" /></label><label>小時<select><option>全部小時</option><option>07:00</option><option>08:00</option></select></label><button type="reset">恢復預設</button></form>
+            <div class="event-card-grid"><article><img src="assets/cctv-preview.png" alt="人員事件畫面" /><div><b>事件 / 0951</b><strong>2026/09/18 07:52:38</strong><span>CAM-0001 · 人員偵測</span></div></article><article><img src="assets/cctv-preview.png" alt="人員事件畫面" /><div><b>事件 / 0950</b><strong>2026/09/18 07:49:56</strong><span>CAM-0001 · 人員偵測</span></div></article></div>
+          </div>
+        </section>
+
+        <section id="exhibitFlowView" class="view exhibit-module-page" aria-label="人流統計">
+          <header class="exhibit-header"><div><small>展品安全監控系統</small><h1>人流統計</h1></div><nav aria-label="展品安全功能"><button type="button" data-view="exhibitLive">即時監看</button><button type="button" data-view="exhibitEvents">事件統計</button><button class="is-active" type="button">人流統計</button><button type="button" data-view="exhibitLeft">遺留物</button><button type="button" data-view="exhibitMissing">遺失物</button><button type="button" data-view="exhibitSecurity">攝影機管理</button><button type="button" data-view="exhibitBackup">備份管理</button></nav></header>
+          <div class="exhibit-report-body"><div class="exhibit-report-actions"><button type="button" data-view="exhibitLive">返回即時監看</button><button type="button" data-camera-refresh>更新資料</button></div><form class="exhibit-filters compact"><label>攝影機<select><option>辦公室-space01 · CAM-0001</option></select></label><label>統計日期<input type="date" value="2026-09-18" /></label></form><div class="exhibit-kpis four"><article><span>最新人流</span><strong>0</strong></article><article><span>最高人流</span><strong>0</strong></article><article><span>平均人流</span><strong>0</strong></article><article><span>取樣數</span><strong>97</strong></article></div><section class="flow-chart"><header><span>24 小時人流</span><strong>2026-09-18</strong></header><div class="flow-chart-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span>00:00</span><span>03:00</span><span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span><b></b></div></section></div>
+        </section>
+
+        <section id="exhibitLeftView" class="view exhibit-module-page" aria-label="遺留物">
+          <header class="exhibit-header"><div><small>展品安全監控系統</small><h1>遺留物事件</h1></div><nav aria-label="展品安全功能"><button type="button" data-view="exhibitLive">即時監看</button><button type="button" data-view="exhibitEvents">事件統計</button><button type="button" data-view="exhibitFlow">人流統計</button><button class="is-active" type="button">遺留物</button><button type="button" data-view="exhibitMissing">遺失物</button><button type="button" data-view="exhibitSecurity">攝影機管理</button><button type="button" data-view="exhibitBackup">備份管理</button></nav></header>
+          <div class="exhibit-report-body object-report"><div class="baseline-panel"><header><span>基準畫面</span><strong>CAM-0001</strong></header><img src="assets/cctv-preview.png" alt="物件基準畫面" /></div><div class="object-summary"><div class="exhibit-kpis"><article><span>全部事件</span><strong>123</strong></article><article><span>今日事件</span><strong>0</strong></article><article><span>篩選結果</span><strong>5</strong></article></div><form class="exhibit-filters"><label>攝影機<select><option>全部攝影機</option></select></label><label>年份<select><option>2026</option></select></label><label>日期<input type="date" value="2026-09-08" /></label><label>小時<select><option>全部小時</option></select></label><button type="reset">恢復預設</button></form></div><div class="event-card-grid object-events"><article><img src="assets/cctv-preview.png" alt="遺留物事件" /><div><b>遺留物 / 0123</b><strong>2026/09/08 11:44:51</strong><span>CAM-0001 · suitcase</span></div></article><article><img src="assets/cctv-preview.png" alt="遺留物事件" /><div><b>遺留物 / 0122</b><strong>2026/09/08 10:50:24</strong><span>CAM-0001 · dining table</span></div></article></div></div>
+        </section>
+
+        <section id="exhibitMissingView" class="view exhibit-module-page" aria-label="遺失物">
+          <header class="exhibit-header"><div><small>展品安全監控系統</small><h1>遺失物事件</h1></div><nav aria-label="展品安全功能"><button type="button" data-view="exhibitLive">即時監看</button><button type="button" data-view="exhibitEvents">事件統計</button><button type="button" data-view="exhibitFlow">人流統計</button><button type="button" data-view="exhibitLeft">遺留物</button><button class="is-active" type="button">遺失物</button><button type="button" data-view="exhibitSecurity">攝影機管理</button><button type="button" data-view="exhibitBackup">備份管理</button></nav></header>
+          <div class="exhibit-report-body object-report"><div class="baseline-panel"><header><span>基準畫面</span><strong>CAM-0001</strong></header><img src="assets/cctv-preview.png" alt="物件基準畫面" /></div><div class="object-summary"><div class="exhibit-kpis"><article><span>全部事件</span><strong>0</strong></article><article><span>今日事件</span><strong>0</strong></article><article><span>篩選結果</span><strong>0</strong></article></div><form class="exhibit-filters"><label>攝影機<select><option>全部攝影機</option></select></label><label>年份<select disabled><option>沒有事件年份</option></select></label><label>日期<input type="date" disabled /></label><label>小時<select><option>全部小時</option></select></label><button type="reset">恢復預設</button></form></div><div class="object-empty"><strong>尚無遺失物事件</strong><span>基準圖中的物件消失並持續超過時間門檻後，事件會顯示在這裡。</span></div></div>
+        </section>
+
+        <section id="exhibitBackupView" class="view exhibit-module-page" aria-label="備份管理">
+          <header class="exhibit-header"><div><small>展品安全監控系統</small><h1>備份管理</h1></div><nav aria-label="展品安全功能"><button type="button" data-view="exhibitLive">即時監看</button><button type="button" data-view="exhibitEvents">事件統計</button><button type="button" data-view="exhibitFlow">人流統計</button><button type="button" data-view="exhibitLeft">遺留物</button><button type="button" data-view="exhibitMissing">遺失物</button><button type="button" data-view="exhibitSecurity">攝影機管理</button><button class="is-active" type="button">備份管理</button></nav></header>
+          <div class="exhibit-report-body"><div class="backup-summary"><span>人物事件 <b>951</b></span><span>人流取樣 <b>10739</b></span><span>可備份區間 <b>2026-08-12 至 2026-09-18</b></span><span>日期基準 <b>Asia/Taipei</b></span></div><div class="backup-grid"><section><header><b>01</b><div><small>匯出資料</small><h2>建立備份套件</h2></div></header><p>選擇起迄日期，將事件、統計與影像資料建立成備份檔。</p><div class="backup-dates"><label>起始日期<input id="backupStartDate" type="date" value="2026-09-18" /></label><label>結束日期<input id="backupEndDate" type="date" value="2026-09-18" /></label></div><button id="backupExportBtn" type="button">建立並下載備份</button></section><section><header><b>02</b><div><small>匯入資料</small><h2>還原備份套件</h2></div></header><p>選擇先前匯出的備份檔，驗證內容後還原資料。</p><label class="backup-file">選擇備份檔<input id="backupFileInput" type="file" accept=".json,.zip" /><span id="backupFileName">尚未選擇檔案</span></label><button id="backupImportBtn" type="button" disabled>驗證並開始匯入</button></section></div></div>
+        </section>
 
         <section id="dashboardView" class="view is-current dashboard-page" aria-label="物聯網數據平台">
           <div class="kpi-strip">
@@ -291,90 +416,487 @@
           </div>
 
           <div class="access-steps" aria-label="授權流程">
-            <div class="step is-active" data-step-indicator="1"><b>1</b><strong>Step 1</strong></div>
-            <div class="step" data-step-indicator="2"><b>2</b><strong>Step 2</strong></div>
-            <div class="step" data-step-indicator="3"><b>3</b><strong>Step 3</strong></div>
+            <div class="step is-active" data-step-indicator="1"><b>1</b><strong>進出群組管理</strong></div>
+            <div class="step" data-step-indicator="2"><b>2</b><strong>人員資料</strong></div>
+            <div class="step" data-step-indicator="3"><b>3</b><strong>樓層-門</strong></div>
+            <div class="step" data-step-indicator="4"><b>4</b><strong>時段選擇</strong></div>
           </div>
 
           <div class="access-board">
-            <section class="access-step-panel is-active" data-access-step="1" aria-label="Step 1 客戶清單">
-              <div class="access-step-one">
-                <section class="access-panel access-source" aria-label="住戶清單">
-                  <div class="access-search">
-                    <label><span>⌕</span><input id="accessNameSearch" placeholder="請輸入搜尋客戶名稱" /></label>
-                    <label><span>⌕</span><input id="accessPhoneSearch" placeholder="請輸入搜尋客戶手機" /></label>
-                    <button id="accessSearchBtn" type="button">搜尋</button>
+            <section class="access-step-panel is-active" data-access-step="1" aria-label="進出群組管理">
+              <div class="access-group-step">
+                <h2>權限群組</h2>
+                <div class="access-group-controls">
+                  <div class="access-group-select-wrap">
+                    <button id="accessGroupSelect" class="access-group-select" type="button" aria-haspopup="listbox" aria-expanded="false">
+                      <span id="accessGroupCurrent">飛彈展示廳</span><span class="select-chevron">⌄</span>
+                    </button>
+                    <div id="accessGroupMenu" class="access-group-menu" role="listbox" aria-label="權限群組清單"></div>
                   </div>
-                  <table class="access-table">
-                    <thead>
-                      <tr><th>卡號</th><th>客戶姓名</th><th>客戶手機</th></tr>
-                    </thead>
-                    <tbody id="accessRows" aria-label="客戶多選清單">
-                      <tr class="is-picked" data-access-row role="checkbox" aria-checked="true" tabindex="0" data-card="3265708516" data-name="王志明" data-phone="0912-305-816"><td>3265708516</td><td>王志明</td><td>0912-305-816</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="0831011879" data-name="林佳蓉" data-phone="0931-011-879"><td>0831011879</td><td>林佳蓉</td><td>0931-011-879</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="0839848711" data-name="陳建宏" data-phone="0939-848-711"><td>0839848711</td><td>陳建宏</td><td>0939-848-711</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="0840222999" data-name="張雅婷" data-phone="0940-222-999"><td>0840222999</td><td>張雅婷</td><td>0940-222-999</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="0830930759" data-name="許文凱" data-phone="0930-930-759"><td>0830930759</td><td>許文凱</td><td>0930-930-759</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="0898105335" data-name="黃郁庭" data-phone="0989-105-335"><td>0898105335</td><td>黃郁庭</td><td>0989-105-335</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="0843123527" data-name="李俊廷" data-phone="0943-123-527"><td>0843123527</td><td>李俊廷</td><td>0943-123-527</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="3738076647" data-name="高美玲" data-phone="0973-807-647"><td>3738076647</td><td>高美玲</td><td>0973-807-647</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="3738801703" data-name="謝承恩" data-phone="0973-880-703"><td>3738801703</td><td>謝承恩</td><td>0973-880-703</td></tr>
-                      <tr data-access-row role="checkbox" aria-checked="false" tabindex="0" data-card="3739509479" data-name="周怡君" data-phone="0973-950-479"><td>3739509479</td><td>周怡君</td><td>0973-950-479</td></tr>
-                    </tbody>
-                  </table>
-                </section>
-
-                <section class="access-panel access-selected" aria-label="已選清單">
-                  <h2>已選清單</h2>
-                  <table class="access-table">
-                    <thead>
-                      <tr><th>卡號</th><th>客戶姓名</th><th>客戶手機</th></tr>
-                    </thead>
-                    <tbody id="selectedAccessRows">
-                      <tr class="empty-row"><td colspan="3">暫無資料</td></tr>
-                    </tbody>
-                  </table>
-                </section>
+                  <button class="group-action is-add" type="button" data-group-action="add"><span aria-hidden="true">＋</span>新增群組</button>
+                  <button class="group-action is-edit" type="button" data-group-action="edit"><span aria-hidden="true">✎</span>修改名稱</button>
+                  <button class="group-action is-delete" type="button" data-group-action="delete"><span class="trash-icon" aria-hidden="true"></span>刪除群組</button>
+                </div>
               </div>
-              <div class="access-actions"><button type="button" disabled>上一步</button><button type="button" data-access-next>下一步</button></div>
+              <div class="access-actions"><span></span><button type="button" data-access-next>下一步</button></div>
             </section>
 
-            <section class="access-step-panel" data-access-step="2" aria-label="Step 2 電梯樓層">
-              <div class="access-step-two">
-                <aside class="floor-list" aria-label="住戶電梯樓層">
-                  <h2>住戶電梯</h2>
-                  <button class="is-selected" type="button" data-floor="B3F">B3F</button>
-                  <button type="button" data-floor="B2F">B2F</button>
-                  <button type="button" data-floor="B1F">B1F</button>
-                  <button type="button" data-floor="1F">1F</button>
-                  <button type="button" data-floor="2F">2F</button>
-                  <button type="button" data-floor="3F">3F</button>
-                  <button type="button" data-floor="4F">4F</button>
-                  <button type="button" data-floor="5F">5F</button>
-                </aside>
-                <section class="floor-target">
-                  <strong id="selectedFloorLabel">B3F</strong>
+            <section class="access-step-panel" data-access-step="2" aria-label="人員資料">
+              <div class="access-people-step">
+                <section class="people-list-panel" aria-label="人員清單">
+                  <div class="access-search">
+                    <label><span>⌕</span><input id="accessNameSearch" placeholder="請輸入搜尋名字" /></label>
+                    <label><span>⌕</span><input id="accessPhoneSearch" placeholder="請輸入搜尋手機號碼" /></label>
+                    <button id="accessSearchBtn" type="button">⌕&nbsp; 搜尋</button>
+                  </div>
+                  <div class="people-table-scroll">
+                    <table class="access-table people-table">
+                      <thead><tr><th><input id="accessSelectAll" type="checkbox" checked aria-label="全選人員" /></th><th>卡號</th><th>客戶姓名</th><th>客戶手機</th><th>戶號別</th></tr></thead>
+                      <tbody id="accessRows"></tbody>
+                    </table>
+                  </div>
+                  <div class="people-pagination">
+                    <span>共 190 項</span><select aria-label="每頁筆數"><option>10項/頁</option></select>
+                    <nav><button type="button" disabled>‹</button><button class="is-current" type="button">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button><button type="button">6</button><button type="button">…</button><button type="button">19</button><button type="button">›</button></nav>
+                  </div>
+                </section>
+
+                <div class="people-transfer" aria-label="移動人員">
+                  <button type="button" data-people-transfer="all-right" aria-label="全部加入">»</button>
+                  <button type="button" data-people-transfer="right" aria-label="加入選取人員">›</button>
+                  <button type="button" data-people-transfer="left" aria-label="移除選取人員">‹</button>
+                  <button type="button" data-people-transfer="all-left" aria-label="全部移除">«</button>
+                </div>
+
+                <section class="selected-people-panel" aria-label="已選清單">
+                  <h2>已選清單</h2>
+                  <div class="people-table-scroll">
+                    <table class="access-table people-table">
+                      <thead><tr><th><input id="selectedPeopleAll" type="checkbox" aria-label="全選已選人員" /></th><th>卡號</th><th>客戶姓名</th><th>客戶手機</th><th>戶號別</th></tr></thead>
+                      <tbody id="selectedAccessRows"></tbody>
+                    </table>
+                  </div>
                 </section>
               </div>
               <div class="access-actions"><button type="button" data-access-prev>上一步</button><button type="button" data-access-next>下一步</button></div>
             </section>
 
-            <section class="access-step-panel" data-access-step="3" aria-label="Step 3 時段">
-              <div class="access-step-three">
+            <section class="access-step-panel" data-access-step="3" aria-label="樓層與門禁點">
+              <div class="access-floor-step">
+                <aside class="floor-list" aria-label="樓層清單">
+                  <h2>樓層</h2>
+                  <button type="button" data-floor="B2F">B2F</button>
+                  <button class="is-selected" type="button" data-floor="1F">1F</button>
+                  <button type="button" data-floor="2F">2F</button>
+                  <button type="button" data-floor="3F">3F</button>
+                  <button type="button" data-floor="4F">4F</button>
+                  <button type="button" data-floor="5F">5F</button>
+                  <button type="button" data-floor="6F">6F</button>
+                  <button type="button" data-floor="7F">7F</button>
+                </aside>
+                <section id="floorDoorTree" class="floor-target" aria-label="樓層門禁點"></section>
+              </div>
+              <div class="access-actions"><button type="button" data-access-prev>上一步</button><button type="button" data-access-next>下一步</button></div>
+            </section>
+
+            <section class="access-step-panel" data-access-step="4" aria-label="時段選擇">
+              <div class="access-time-step">
                 <div class="time-column">
-                  <button type="button">全時段</button>
-                  <button type="button">臨時自動門時段</button>
+                  <button type="button" data-time-slot="全時段">全時段</button>
+                  <button type="button" data-time-slot="臨時自動門時段">臨時自動門時段</button>
                 </div>
                 <div class="time-column">
-                  <button type="button">門禁解除時段</button>
-                  <button class="is-selected" type="button">空白時段</button>
+                  <button class="is-selected" type="button" data-time-slot="門禁解除時段">門禁解除時段</button>
+                  <button type="button" data-time-slot="空白時段">空白時段</button>
                 </div>
                 <div class="time-column">
-                  <button type="button">1F2F自動門解除時段</button>
+                  <button type="button" data-time-slot="1F2F自動門解除時段">1F2F自動門解除時段</button>
                 </div>
               </div>
               <div class="access-actions"><button type="button" data-access-prev>上一步</button><button type="button" data-access-submit>送出</button></div>
             </section>
+          </div>
+        </section>
+
+        <div id="accessGroupModal" class="access-group-modal" role="dialog" aria-modal="true" aria-labelledby="accessGroupModalTitle">
+          <form id="accessGroupForm" class="access-group-modal-panel">
+            <button class="access-group-modal-close" type="button" data-group-modal-close aria-label="關閉">×</button>
+            <h2 id="accessGroupModalTitle">修改</h2>
+            <label id="accessGroupField">
+              <span id="accessGroupLabel">修改群組名稱</span>
+              <input id="accessGroupNameInput" type="text" maxlength="30" autocomplete="off" />
+            </label>
+            <p id="accessGroupDeleteText" class="access-group-delete-text" hidden></p>
+            <div class="access-group-modal-actions">
+              <button type="button" data-group-modal-close>取消</button>
+              <button type="submit">確定</button>
+            </div>
+          </form>
+        </div>
+
+        <section id="personnelAccessView" class="view personnel-access-page" aria-label="人員進出">
+          <div class="access-tabs" aria-label="人員進出分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button class="is-active" type="button">人員進出 <span>×</span></button>
+          </div>
+          <div class="personnel-download-grid">
+            <fieldset class="download-panel permission-groups">
+              <label><input id="allPermissionGroups" type="checkbox" />全通</label>
+              <label class="is-blue"><input type="checkbox" name="permissionGroup" checked />行政人員組</label>
+              <label><input type="checkbox" name="permissionGroup" />訪客組</label>
+            </fieldset>
+            <fieldset id="downloadZonePanel" class="download-panel download-zones is-disabled">
+              <label><input type="checkbox" disabled />1F-大廳</label>
+              <label><input type="checkbox" disabled />2F展示廳</label>
+              <label><input type="checkbox" disabled />第二展廳</label>
+              <label><input type="checkbox" disabled />第三展廳</label>
+            </fieldset>
+            <fieldset class="download-panel download-options">
+              <label><input type="radio" name="downloadMode" value="all" />全部下載</label>
+              <label class="is-blue"><input type="radio" name="downloadMode" value="diff" checked />異動下載</label>
+              <label class="is-blue"><input id="downloadSchedule" type="checkbox" />下載時段</label>
+              <button id="personnelDownloadBtn" type="button">下載</button>
+            </fieldset>
+            <div class="download-mode-option is-blue"><label><input type="checkbox" checked />全選</label><label><input id="permissionGroupMode" type="radio" name="zoneMode" checked />依授權群組</label></div>
+            <div class="download-mode-option"><label><input type="checkbox" />全選</label><label><input id="deviceMode" type="radio" name="zoneMode" />依裝置</label></div>
+          </div>
+        </section>
+
+        <section id="visitorBookingView" class="view visitor-booking-page" aria-label="訪客預約">
+          <div class="access-tabs" aria-label="訪客預約分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button type="button" data-view="personnelAccess">人員進出 <span>×</span></button>
+            <button class="is-active" type="button">訪客預約 <span>×</span></button>
+          </div>
+          <form id="visitorBookingForm" class="visitor-booking-card">
+            <label><span><i>*</i> 姓名</span><input id="visitorName" placeholder="請輸入姓名" required /></label>
+            <label><span><i>*</i> 手機</span><input id="visitorPhone" inputmode="tel" placeholder="請輸入手機號碼" required /></label>
+            <label><span>管制區域:</span><select id="visitorZone"><option value="">請選擇管制區域</option><option>test5-12FF</option><option>test6-11F</option><option>test7-10F</option><option>test9-14F</option><option>Reddot-12FC室</option></select></label>
+            <label><span><i>*</i> 拜訪開始時間</span><button class="visitor-datetime-input" type="button" data-visitor-datetime="start"><b>◷</b><em id="visitorStartText">選擇開始日期與時間</em></button></label>
+            <label><span><i>*</i> 拜訪結束時間</span><button class="visitor-datetime-input" type="button" data-visitor-datetime="end"><b>◷</b><em id="visitorEndText">選擇結束日期與時間</em></button></label>
+            <button class="visitor-submit" type="submit">建立預約</button>
+          </form>
+          <div id="visitorDatePicker" class="visitor-date-picker" aria-label="選擇日期與時間">
+            <div class="visitor-picker-inputs"><input id="visitorPickerDate" placeholder="選擇日期" readonly /><input id="visitorPickerTime" type="time" value="09:00" /></div>
+            <div class="visitor-picker-head"><button type="button" data-picker-shift="-12">«</button><button type="button" data-picker-shift="-1">‹</button><strong id="visitorPickerTitle">2026 年 9 月</strong><button type="button" data-picker-shift="1">›</button><button type="button" data-picker-shift="12">»</button></div>
+            <div class="visitor-picker-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+            <div id="visitorPickerDays" class="visitor-picker-days"></div>
+            <div class="visitor-picker-actions"><button type="button" data-picker-today>現在</button><button type="button" data-picker-confirm>確認</button></div>
+          </div>
+        </section>
+
+        <section id="reservationCardView" class="view reservation-card-page" aria-label="預約發卡">
+          <div class="access-tabs" aria-label="預約發卡分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button type="button" data-view="personnelAccess">人員進出 <span>×</span></button>
+            <button class="is-active" type="button">預約發卡 <span>×</span></button>
+          </div>
+          <div class="reservation-steps" aria-label="預約發卡流程">
+            <div class="reservation-step is-active" data-reservation-indicator="1"><b>1</b><strong>訪客資料</strong></div>
+            <div class="reservation-step" data-reservation-indicator="2"><b>2</b><strong>進出群組管理</strong></div>
+          </div>
+          <section class="reservation-panel is-active" data-reservation-step="1">
+            <form id="reservationVisitorForm" class="reservation-visitor-card">
+              <label><span><i>*</i> 訪客姓名</span><input id="reservationName" placeholder="請輸入訪客姓名" required /></label>
+              <label><span><i>*</i> 手機</span><input id="reservationPhone" inputmode="tel" placeholder="請輸入手機號碼" required /></label>
+              <label><span><i>*</i> 卡片號碼</span><input id="reservationCardNumber" placeholder="請輸入卡片號碼" required /></label>
+              <label><span><i>*</i> 拜訪日期</span><input id="reservationDate" type="date" required /></label>
+              <label><span><i>*</i> 拜訪時間(起)</span><input id="reservationStartTime" type="time" required /></label>
+              <label><span><i>*</i> 拜訪時間(迄)</span><input id="reservationEndTime" type="time" required /></label>
+              <button class="reservation-next" type="submit">下一步</button>
+            </form>
+          </section>
+          <section class="reservation-panel" data-reservation-step="2">
+            <div class="reservation-group-step">
+              <h2>權限群組管理</h2>
+              <div class="reservation-group-controls">
+                <div class="reservation-group-select-wrap">
+                  <button id="reservationGroupSelect" type="button"><span id="reservationGroupCurrent">請選擇權限群組</span><span>⌃</span></button>
+                  <div id="reservationGroupMenu" class="reservation-group-menu"></div>
+                </div>
+                <button class="is-add" type="button" data-reservation-group-action="add">＋ 新增群組</button>
+                <button class="is-edit" type="button" data-reservation-group-action="edit" disabled>✎ 修改群組</button>
+                <button class="is-delete" type="button" data-reservation-group-action="delete" disabled>♙ 刪除群組</button>
+              </div>
+            </div>
+            <div class="reservation-actions"><button type="button" data-reservation-prev>上一步</button><button type="button" data-reservation-submit>送出</button></div>
+          </section>
+        </section>
+
+        <div id="reservationGroupModal" class="reservation-group-modal" role="dialog" aria-modal="true" aria-labelledby="reservationGroupModalTitle">
+          <form id="reservationGroupForm" class="reservation-group-modal-panel">
+            <button class="reservation-group-close" type="button" data-reservation-group-close aria-label="關閉">×</button>
+            <h2 id="reservationGroupModalTitle">新增權限群組</h2>
+            <label class="reservation-group-name"><span><i>*</i> 群組名稱</span><input id="reservationGroupName" placeholder="請輸入群組名稱" required /></label>
+            <h3><span>1.</span> 選擇電梯樓層與門禁設備</h3>
+            <div class="reservation-access-grid">
+              <aside><strong>樓層</strong><div id="reservationFloorButtons"></div></aside>
+              <div id="reservationDoorOptions" class="reservation-door-options"></div>
+            </div>
+            <h3><span>2.</span> 選擇適用時段</h3>
+            <div id="reservationTimeOptions" class="reservation-time-options">
+              <button class="is-selected" type="button" data-reservation-time="全時段">全時段</button>
+              <button type="button" data-reservation-time="門禁解除時段">門禁解除時段</button>
+              <button type="button" data-reservation-time="1F2F自動門解除時段">1F2F自動門解除時段</button>
+              <button type="button" data-reservation-time="臨時自動門時段">臨時自動門時段</button>
+              <button type="button" data-reservation-time="空白時段">空白時段</button>
+            </div>
+            <div class="reservation-group-modal-actions"><button type="button" data-reservation-group-close>取消</button><button type="submit">確認儲存</button></div>
+          </form>
+        </div>
+
+        <section id="visitorBookingListView" class="view visitor-list-page" aria-label="訪客預約清單">
+          <div class="access-tabs" aria-label="訪客預約清單分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button type="button" data-view="personnelAccess">人員進出 <span>×</span></button>
+            <button type="button" data-view="reservationCard">預約發卡 <span>×</span></button>
+            <button class="is-active" type="button">訪客預約清單 <span>×</span></button>
+          </div>
+          <div class="visitor-list-toolbar">
+            <label><span>姓名</span><input id="visitorListNameSearch" placeholder="請輸入姓名" /></label>
+            <label><span>手機號</span><input id="visitorListPhoneSearch" placeholder="請輸入手機號" /></label>
+            <label><span>拜訪日期</span><input id="visitorListDateSearch" type="date" /></label>
+            <button id="visitorListSearchBtn" class="is-search" type="button">⌕&nbsp; 查詢</button>
+            <button id="visitorListResetBtn" type="button">重置</button>
+          </div>
+          <div class="visitor-list-commands">
+            <button id="visitorListAddBtn" type="button">新增</button>
+            <button id="visitorListExportBtn" type="button">↓&nbsp; 匯出Excel</button>
+          </div>
+          <div class="visitor-list-table-wrap">
+            <table class="visitor-list-table">
+              <thead><tr><th>姓名</th><th>手機號</th><th>拜訪公司/單位</th><th>樓層</th><th>拜訪日期</th><th>拜訪時間(起)</th><th>拜訪時間(迄)</th><th>操作</th></tr></thead>
+              <tbody id="visitorListRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div id="visitorListModal" class="visitor-list-modal" role="dialog" aria-modal="true" aria-labelledby="visitorListModalTitle">
+          <form id="visitorListForm" class="visitor-list-modal-panel">
+            <button class="visitor-list-modal-close" type="button" data-visitor-list-close aria-label="關閉">×</button>
+            <h2 id="visitorListModalTitle">新增</h2>
+            <label><span>姓名</span><input id="visitorListName" placeholder="請輸入姓名" required /></label>
+            <label><span>手機</span><input id="visitorListPhone" inputmode="tel" placeholder="請輸入手機號碼" required /></label>
+            <label><span>拜訪公司/單位</span><input id="visitorListCompany" placeholder="請輸入拜訪公司/單位" /></label>
+            <label><span>樓層</span><select id="visitorListFloor"><option value="">樓層</option><option>2F</option><option>3F</option><option>4F</option><option>5F</option><option>6F</option><option>7F</option><option>8F</option><option>10F</option><option>12FC室</option><option>13F</option><option>RF</option></select></label>
+            <label><span>拜訪日期</span><input id="visitorListDate" type="date" required /></label>
+            <label><span>拜訪時間(起)</span><input id="visitorListStart" type="time" required /></label>
+            <label><span>拜訪時間(迄)</span><input id="visitorListEnd" type="time" required /></label>
+            <label><span>狀態</span><select id="visitorListStatus"><option>未審核</option><option>審核通過</option><option>審核不通過</option></select></label>
+            <div class="visitor-list-modal-actions"><button type="button" data-visitor-list-close>取消</button><button type="submit">保存</button></div>
+          </form>
+        </div>
+
+        <div id="visitorQrModal" class="visitor-qr-modal" role="dialog" aria-modal="true" aria-labelledby="visitorQrTitle">
+          <div class="visitor-qr-panel">
+            <button class="visitor-qr-close" type="button" data-visitor-qr-close aria-label="關閉">×</button>
+            <h2 id="visitorQrTitle">訪客 QR Code</h2>
+            <h3>宏錦智匯科技大樓</h3>
+            <div id="visitorQrCode" class="visitor-qr-code" aria-label="訪客 QR Code"></div>
+            <div class="visitor-qr-actions"><button type="button" data-copy-visitor-qr>複製 QR Code</button><button type="button" data-print-visitor-qr>列印 QR Code</button></div>
+          </div>
+        </div>
+
+        <section id="remoteDoorView" class="view remote-door-page" aria-label="遙控開門">
+          <div class="access-tabs" aria-label="遙控開門分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button type="button" data-view="personnelAccess">人員進出 <span>×</span></button>
+            <button type="button" data-view="reservationCard">預約發卡 <span>×</span></button>
+            <button type="button" data-view="visitorBookingList">訪客預約清單 <span>×</span></button>
+            <button class="is-active" type="button">遙控開門 <span>×</span></button>
+          </div>
+          <h1>遠端開門控制</h1>
+          <section class="remote-door-card">
+            <header>
+              <h2>請選擇要開啟的門控點位</h2>
+              <button id="remoteDoorExecuteBtn" type="button">➤&nbsp; 執行遠端開門</button>
+            </header>
+            <table class="remote-door-table">
+              <thead><tr><th><input id="remoteDoorAll" type="checkbox" aria-label="全選門控點位" /></th><th>門控點位名稱</th></tr></thead>
+              <tbody id="remoteDoorRows"></tbody>
+            </table>
+          </section>
+        </section>
+
+        <div id="remoteDoorConfirmModal" class="access-system-modal compact" role="dialog" aria-modal="true" aria-labelledby="remoteDoorConfirmTitle">
+          <section class="access-system-panel confirm-panel">
+            <button class="access-system-close" type="button" data-remote-door-close aria-label="關閉">×</button>
+            <h2 id="remoteDoorConfirmTitle">提示</h2>
+            <div class="confirm-message"><span aria-hidden="true">!</span><p id="remoteDoorConfirmText"></p></div>
+            <footer><button type="button" data-remote-door-close>取消</button><button id="remoteDoorConfirmBtn" class="is-primary" type="button">確定開門</button></footer>
+          </section>
+        </div>
+
+        <section id="doorSystemView" class="view door-system-page" aria-label="門禁系統設備">
+          <div class="access-tabs" aria-label="門禁系統設備分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button class="is-active" type="button">門禁系統設備 <span>×</span></button>
+            <button type="button" data-view="personnelAccess">人員進出 <span>×</span></button>
+            <button type="button" data-view="reservationCard">預約發卡 <span>×</span></button>
+            <button type="button" data-view="visitorBookingList">訪客預約清單 <span>×</span></button>
+            <button type="button" data-view="remoteDoor">遙控開門 <span>×</span></button>
+            <button type="button" data-view="elevatorSystem">電梯系統設備 <span>×</span></button>
+          </div>
+          <div class="door-system-command-bar">
+            <button id="doorCalibrateAllBtn" type="button">全部校時</button>
+            <button id="doorUpdateAllBtn" type="button">更新所有門禁</button>
+            <button id="doorAddBtn" type="button">新增設備</button>
+          </div>
+          <div class="door-system-table-wrap">
+            <table class="door-system-table">
+              <thead><tr><th>設備ID</th><th>設備名稱</th><th>IP</th><th>Port</th><th>功能</th></tr></thead>
+              <tbody id="doorSystemRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div id="doorConfirmModal" class="access-system-modal compact" role="dialog" aria-modal="true" aria-labelledby="doorConfirmTitle">
+          <section class="access-system-panel confirm-panel">
+            <button class="access-system-close" type="button" data-door-confirm-close aria-label="關閉">×</button>
+            <h2 id="doorConfirmTitle">提示</h2>
+            <p id="doorConfirmText" class="plain-confirm-text"></p>
+            <footer><button type="button" data-door-confirm-close>取消</button><button id="doorConfirmSubmitBtn" class="is-primary" type="button">確定</button></footer>
+          </section>
+        </div>
+
+        <div id="doorAddModal" class="access-system-modal" role="dialog" aria-modal="true" aria-labelledby="doorAddTitle">
+          <form id="doorAddForm" class="access-system-panel door-add-panel">
+            <button class="access-system-close" type="button" data-door-add-close aria-label="關閉">×</button>
+            <h2 id="doorAddTitle">新增門禁設備</h2>
+            <div class="door-add-grid">
+              <label><span>裝置名稱:</span><input id="doorNameInput" placeholder="裝置名稱" required /></label>
+              <label><span>IP:</span><input id="doorIpInput" placeholder="IP" required /></label>
+              <label><span>Port:</span><input id="doorPortInput" value="3195" inputmode="numeric" required /></label>
+              <label><span>設備型號:</span><select id="doorModelInput" required><option value="">請選擇</option><option>RAC-2400N-4</option><option>RAC-2400N-8</option><option>RAC-2400N-16</option></select></label>
+              <label><span>門數:</span><select id="doorCountInput" required><option value="">請選擇</option><option>4</option><option>8</option><option>16</option></select></label>
+              <label><span>樓層位置:</span><select id="doorFloorInput" required><option value="">請選擇</option><option>B3F</option><option>B2F</option><option>B1F</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option><option>5F</option></select></label>
+            </div>
+            <footer><button type="button" data-door-add-close>取消</button><button class="is-danger" type="submit">新增設備</button></footer>
+          </form>
+        </div>
+
+        <div id="doorReadersModal" class="access-system-modal" role="dialog" aria-modal="true" aria-labelledby="doorReadersTitle">
+          <form id="doorReadersForm" class="access-system-panel door-readers-panel">
+            <button class="access-system-close" type="button" data-door-readers-close aria-label="關閉">×</button>
+            <h2 id="doorReadersTitle">門禁卡機</h2>
+            <div class="door-readers-table-wrap">
+              <table class="door-readers-table">
+                <thead><tr><th>主讀卡機ID</th><th>副讀卡機ID</th><th>設備名稱</th><th>樓層</th><th>使用中</th></tr></thead>
+                <tbody id="doorReadersRows"></tbody>
+              </table>
+            </div>
+            <footer class="door-readers-actions"><button class="is-primary" type="submit">保存</button></footer>
+          </form>
+        </div>
+
+        <div id="doorParamsModal" class="access-system-modal" role="dialog" aria-modal="true" aria-labelledby="doorParamsTitle">
+          <form id="doorParamsForm" class="access-system-panel door-params-panel">
+            <button class="access-system-close" type="button" data-door-params-close aria-label="關閉">×</button>
+            <h2 id="doorParamsTitle">設備參數設定</h2>
+            <div class="door-params-grid">
+              <label><span>刷卡紀錄是否覆蓋</span><select id="doorRecordMode"><option>記錄覆蓋</option><option>不覆蓋</option></select></label>
+              <label><span>非法卡發警報</span><select id="doorIllegalAlarm"><option>不發警報</option><option>發警報</option></select></label>
+              <label><span>沒有合法卡時是否開門</span><select id="doorNoCardMode"><option>開門</option><option>不開門</option></select></label>
+              <label><span>假日/平日權限優先</span><select id="doorPriorityMode"><option>假日權限優先</option><option>平日權限優先</option></select></label>
+              <label><span>刷卡加密時,卡號是否可用按鍵輸入</span><select id="doorKeypadMode"><option>不可以</option><option>可以</option></select></label>
+              <label><span>Anti 重複刷卡延遲</span><div class="number-stepper"><button type="button" data-door-step="anti" data-step-delta="-1">−</button><input id="doorAntiDelay" value="0" inputmode="numeric" /><button type="button" data-door-step="anti" data-step-delta="1">＋</button></div></label>
+              <label><span>解除碼</span><input id="doorReleaseCode" value="0000" maxlength="8" /></label>
+              <label><span>設定錯誤次數</span><div class="number-stepper"><button type="button" data-door-step="errors" data-step-delta="-1">−</button><input id="doorErrorCount" value="0" inputmode="numeric" /><button type="button" data-door-step="errors" data-step-delta="1">＋</button></div></label>
+              <label><span>解除模式</span><select id="doorReleaseMode"><option>使用合法卡解除</option><option>密碼解除</option></select></label>
+            </div>
+            <footer><button type="button" data-door-params-close>取消</button><button class="is-primary" type="submit">儲存並派送參數</button></footer>
+          </form>
+        </div>
+
+        <section id="elevatorSystemView" class="view elevator-system-page" aria-label="電梯系統設備">
+          <div class="access-tabs" aria-label="電梯系統設備分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button type="button" data-view="personnelAccess">人員進出 <span>×</span></button>
+            <button type="button" data-view="reservationCard">預約發卡 <span>×</span></button>
+            <button type="button" data-view="visitorBookingList">訪客預約清單 <span>×</span></button>
+            <button type="button" data-view="remoteDoor">遙控開門 <span>×</span></button>
+            <button class="is-active" type="button">電梯系統設備 <span>×</span></button>
+          </div>
+          <div class="elevator-command-bar">
+            <button id="elevatorUpdateAllBtn" type="button">更新所有電梯</button>
+            <button id="elevatorAddBtn" type="button">新增設備</button>
+          </div>
+          <div class="elevator-table-wrap">
+            <table class="elevator-table">
+              <thead><tr><th>設備ID</th><th>設備名稱</th><th>IP</th><th>Port</th><th>功能</th></tr></thead>
+              <tbody id="elevatorRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div id="elevatorFloorModal" class="access-system-modal" role="dialog" aria-modal="true" aria-labelledby="elevatorFloorTitle">
+          <form id="elevatorFloorForm" class="access-system-panel elevator-floor-panel">
+            <button class="access-system-close" type="button" data-elevator-floor-close aria-label="關閉">×</button>
+            <h2 id="elevatorFloorTitle">樓層設定</h2>
+            <div class="elevator-floor-table-wrap">
+              <table class="elevator-floor-table">
+                <thead><tr><th>主讀卡機ID</th><th>樓層名稱</th><th>樓層位置</th><th>啟用</th></tr></thead>
+                <tbody id="elevatorFloorRows"></tbody>
+              </table>
+            </div>
+            <footer class="elevator-floor-actions"><button class="is-primary" type="submit">保存</button><button id="elevatorFloorResetBtn" type="button">恢復初始值</button></footer>
+          </form>
+        </div>
+
+        <div id="elevatorAddModal" class="access-system-modal" role="dialog" aria-modal="true" aria-labelledby="elevatorAddTitle">
+          <form id="elevatorAddForm" class="access-system-panel elevator-add-panel">
+            <button class="access-system-close" type="button" data-elevator-add-close aria-label="關閉">×</button>
+            <h2 id="elevatorAddTitle">新增電梯設備</h2>
+            <div class="elevator-add-grid">
+              <label><span>電梯名稱:</span><input id="elevatorNameInput" placeholder="電梯名稱" required /></label>
+              <label><span>IP:</span><input id="elevatorIpInput" placeholder="IP" required /></label>
+              <label><span>Port:</span><input id="elevatorPortInput" value="4660" inputmode="numeric" required /></label>
+              <label><span>控制節點:</span><select id="elevatorNodeInput" required><option value="">請選擇</option><option>MCU0008</option><option>MCU0016</option></select></label>
+              <label><span>硬體編號:</span><input id="elevatorHardwareInput" value="1" inputmode="numeric" required /></label>
+            </div>
+            <footer><button type="button" data-elevator-add-close>取消</button><button class="is-danger" type="submit">新增設備</button></footer>
+          </form>
+        </div>
+
+        <div id="elevatorUpdateModal" class="access-system-modal compact" role="dialog" aria-modal="true" aria-labelledby="elevatorUpdateTitle">
+          <section class="access-system-panel confirm-panel">
+            <button class="access-system-close" type="button" data-elevator-update-close aria-label="關閉">×</button>
+            <h2 id="elevatorUpdateTitle">提示</h2>
+            <p class="plain-confirm-text">確定更新所有電梯?</p>
+            <footer><button type="button" data-elevator-update-close>取消</button><button id="elevatorUpdateConfirmBtn" class="is-primary" type="button">確定</button></footer>
+          </section>
+        </div>
+
+        <section id="elevatorHistoryView" class="view log-history-page" aria-label="電梯歷史列表">
+          <div class="access-tabs" aria-label="電梯歷史列表分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button type="button" data-view="doorSystem">門禁系統設備 <span>×</span></button>
+            <button type="button" data-view="accessRealtime">門禁進出即時監控 <span>×</span></button>
+            <button type="button" data-view="personnelAccess">人員進出 <span>×</span></button>
+            <button type="button" data-view="reservationCard">預約發卡 <span>×</span></button>
+            <button type="button" data-view="visitorBookingList">訪客預約清單 <span>×</span></button>
+            <button type="button" data-view="remoteDoor">遙控開門 <span>×</span></button>
+            <button type="button" data-view="elevatorSystem">電梯系統設備 <span>×</span></button>
+            <button class="is-active" type="button">電梯歷史列表 <span>×</span></button>
+            <button type="button" data-view="accessHistory">門禁歷史列表 <span>×</span></button>
+          </div>
+          <div class="log-history-toolbar">
+            <label class="log-range"><span>◷</span><input id="elevatorHistoryRange" placeholder="Start Date        -        End Date" /></label>
+            <select id="elevatorHistoryPoint"><option value="">電梯</option><option>1F-大廳</option><option>2F展示廳</option></select>
+            <label class="log-search"><span>⌕</span><input id="elevatorHistoryName" placeholder="請輸入搜尋姓名" /></label>
+            <button id="elevatorHistorySearchBtn" type="button">⌕&nbsp; 搜尋</button>
+            <button id="elevatorHistoryExportBtn" type="button">↓&nbsp; 匯出Excel</button>
+          </div>
+          <div class="log-table-wrap">
+            <table class="log-table"><thead><tr><th>事件地點</th><th>卡片號碼</th><th>姓名</th><th>事件</th><th>進出</th><th>日期時間</th></tr></thead><tbody id="elevatorHistoryRows"><tr><td colspan="6">暫無資料</td></tr></tbody></table>
           </div>
         </section>
 
@@ -385,12 +907,13 @@
           </div>
 
           <div class="history-toolbar">
-            <label class="history-range"><span>◷</span><input id="historyRangeInput" value="2024-09-01 00:00:00  -  2026-10-31 00:00:00" /></label>
+            <label class="history-range"><span>◷</span><input id="historyRangeInput" placeholder="Start Date        -        End Date" /></label>
             <label>
               <select id="historyEventFilter">
                 <option value="">門禁點</option>
-                <option>刷卡事件</option>
-                <option>一般事件</option>
+                <option>1F 大廳入口閘門</option>
+                <option>2F 特展廳管制門</option>
+                <option>B1 機房讀卡機</option>
               </select>
             </label>
             <label class="history-search"><span>⌕</span><input id="historySearchInput" placeholder="請輸入搜尋姓名" /></label>
@@ -429,6 +952,36 @@
           </div>
         </section>
 
+        <section id="accessRealtimeView" class="view realtime-log-page" aria-label="門禁進出即時監控">
+          <div class="access-tabs" aria-label="門禁進出即時監控分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button type="button" data-view="doorSystem">門禁系統設備 <span>×</span></button>
+            <button class="is-active" type="button">門禁進出即時監控 <span>×</span></button>
+            <button type="button" data-view="accessHistory">門禁歷史列表 <span>×</span></button>
+            <button type="button" data-view="readerRealtime">卡機狀態即時監控 <span>×</span></button>
+          </div>
+          <button class="realtime-export" type="button" data-realtime-export="access">↓&nbsp; 匯出Excel</button>
+          <div class="realtime-table-wrap">
+            <table class="realtime-table"><thead><tr><th>地點</th><th>卡片號碼</th><th>姓名</th><th>事件</th><th>進出</th><th>日期時間</th></tr></thead><tbody id="accessRealtimeRows"></tbody></table>
+          </div>
+        </section>
+
+        <section id="readerRealtimeView" class="view realtime-log-page" aria-label="卡機狀態即時監控">
+          <div class="access-tabs" aria-label="卡機狀態即時監控分頁">
+            <button type="button" data-home>首頁</button>
+            <button type="button" data-view="access">門禁授權 <span>×</span></button>
+            <button type="button" data-view="doorSystem">門禁系統設備 <span>×</span></button>
+            <button type="button" data-view="accessRealtime">門禁進出即時監控 <span>×</span></button>
+            <button type="button" data-view="accessHistory">門禁歷史列表 <span>×</span></button>
+            <button class="is-active" type="button">卡機狀態即時監控 <span>×</span></button>
+          </div>
+          <button class="realtime-export" type="button" data-realtime-export="reader">↓&nbsp; 匯出Excel</button>
+          <div class="realtime-table-wrap">
+            <table class="realtime-table"><thead><tr><th>地點</th><th>卡片號碼</th><th>姓名</th><th>事件</th><th>進出</th><th>日期時間</th></tr></thead><tbody id="readerRealtimeRows"></tbody></table>
+          </div>
+        </section>
+
         <section id="workdayView" class="view workday-page" aria-label="工作日設定">
           <div class="access-tabs" aria-label="工作日設定分頁">
             <button type="button" data-home>首頁</button>
@@ -442,14 +995,14 @@
           </div>
 
           <div class="workday-page-tabs" aria-label="工作日組別">
-            <button class="is-active" type="button">1</button>
-            <button type="button">2</button>
-            <button type="button">3</button>
-            <button type="button">4</button>
-            <button type="button">5</button>
-            <button type="button">6</button>
-            <button type="button">7</button>
-            <button type="button">8</button>
+            <button class="is-active" type="button" data-workday-group="0" aria-pressed="true">1</button>
+            <button type="button" data-workday-group="1" aria-pressed="false">2</button>
+            <button type="button" data-workday-group="2" aria-pressed="false">3</button>
+            <button type="button" data-workday-group="3" aria-pressed="false">4</button>
+            <button type="button" data-workday-group="4" aria-pressed="false">5</button>
+            <button type="button" data-workday-group="5" aria-pressed="false">6</button>
+            <button type="button" data-workday-group="6" aria-pressed="false">7</button>
+            <button type="button" data-workday-group="7" aria-pressed="false">8</button>
           </div>
 
           <div class="workday-table-wrap">
